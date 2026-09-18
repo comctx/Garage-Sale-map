@@ -17,6 +17,7 @@ input,textarea{width:100%;padding:11px;border:1px solid #cbd5e1;border-radius:9p
 textarea{min-height:90px}
 button{border:0;border-radius:9px;padding:11px 14px;font-weight:700;cursor:pointer}
 .primary{background:#2563eb;color:#fff}
+.danger{background:#fee2e2;color:#991b1b}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .sale{border:1px solid #e5e7eb;border-radius:12px;padding:14px;margin-top:12px}
 .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
@@ -106,8 +107,6 @@ function isActive(row){
     return Number.isFinite(end) && end > now;
   }
 
-  // Older listings created before the Ends field existed stay visible
-  // for at most 48 hours from creation.
   if(row.created_at){
     const created=new Date(row.created_at).getTime();
     return Number.isFinite(created) && created + (48*60*60*1000) > now;
@@ -153,6 +152,7 @@ function render(){
       <p><b>Items:</b> ${esc(s.items)}</p>
       <div class="actions">
         <button class="primary" onclick="window.open('${directions(s.address)}','_blank')">Get Directions</button>
+        <button class="danger" onclick="removeSale(${s.id})">Delete / Sale Is Over</button>
       </div>
     </div>
   `).join('');
@@ -261,12 +261,30 @@ async function addSale(e){
     : 'Garage sale posted. It will expire automatically, but the address could not be placed on the map.';
 }
 
+async function removeSale(id){
+  const sale=sales.find(s=>s.id===id);
+  const label=sale?.address ? `\n\n${sale.address}` : '';
+  const ok=confirm('Remove this garage sale for everyone? Use this only if the sale is over or no longer active.'+label);
+  if(!ok) return;
+
+  const {error}=await db
+    .from('garage_sales')
+    .delete()
+    .eq('id',id);
+
+  if(error){
+    console.error(error);
+    alert('Could not remove the garage sale. Please try again.');
+    return;
+  }
+
+  sales=sales.filter(s=>s.id!==id);
+  render();
+}
+
 document.getElementById('form').addEventListener('submit',addSale);
 document.getElementById('search').addEventListener('input',render);
-
-// Re-check expiration every minute while the page is open.
 setInterval(render,60000);
-
 loadSales();
 </script>
 </body>
