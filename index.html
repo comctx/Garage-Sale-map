@@ -22,7 +22,7 @@ button{border:0;border-radius:9px;padding:11px 14px;font-weight:700;cursor:point
 .sale{border:1px solid #e5e7eb;border-radius:12px;padding:14px;margin-top:12px}
 .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .muted{color:#64748b;font-size:14px}
-.error{color:#991b1b}.sale-photo{width:100%;max-width:420px;max-height:300px;object-fit:cover;border-radius:10px;margin:8px 0 12px;display:block;cursor:pointer}.results-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.result-count{font-weight:700;color:#475569}.badge-row{display:flex;gap:7px;flex-wrap:wrap;margin:4px 0 8px}.sale-badge{display:inline-block;padding:5px 8px;border-radius:999px;font-size:12px;font-weight:800}.badge-new{background:#dcfce7;color:#166534}.badge-ending{background:#fee2e2;color:#991b1b}.refresh-status{align-self:center}.compact-btn.active{background:#2563eb;color:#fff}#list.compact-view .sale{padding:10px;margin-top:8px}#list.compact-view .sale h3{margin:2px 0 6px}#list.compact-view .sale p{margin:4px 0}#list.compact-view .sale-photo{max-width:220px;max-height:145px;margin:6px 0 8px}#list.compact-view .actions{gap:6px;margin-top:7px}#list.compact-view .actions button{padding:8px 10px;font-size:14px}.photo-modal{position:fixed;inset:0;background:rgba(0,0,0,.82);display:none;align-items:center;justify-content:center;padding:20px;z-index:9999}.photo-modal.open{display:flex}.photo-modal-inner{position:relative;max-width:min(900px,95vw);max-height:90vh}.photo-modal img{display:block;max-width:100%;max-height:85vh;border-radius:12px;background:#fff}.photo-modal-close{position:absolute;right:-10px;top:-12px;width:44px;height:44px;border-radius:50%;background:#fff;color:#111827;font-size:26px;line-height:1;padding:0;box-shadow:0 3px 12px rgba(0,0,0,.35)}.photo-section{margin-top:16px;padding:16px;border:2px solid #2563eb;border-radius:12px;background:#eff6ff}.photo-title{font-size:20px;font-weight:800;color:#1d4ed8;margin-bottom:6px;display:block}.photo-note{display:block;font-size:14px;color:#475569;margin:6px 0 0}.empty-state{padding:22px;border:2px solid #cbd5e1;border-radius:12px;background:#f8fafc;text-align:center;font-size:22px;font-weight:700;color:#334155;margin-top:12px}.empty-state small{display:block;font-size:14px;font-weight:400;color:#64748b;margin-top:6px}
+.error{color:#991b1b}.sale-photo{width:100%;max-width:420px;max-height:300px;object-fit:cover;border-radius:10px;margin:8px 0 12px;display:block;cursor:pointer}.results-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.result-count{font-weight:700;color:#475569}.badge-row{display:flex;gap:7px;flex-wrap:wrap;margin:4px 0 8px}.sale-badge{display:inline-block;padding:5px 8px;border-radius:999px;font-size:12px;font-weight:800}.badge-new{background:#dcfce7;color:#166534}.badge-ending{background:#fee2e2;color:#991b1b}.badge-visited{background:#e0e7ff;color:#3730a3}.sale.visited-sale{background:#f8fafc;border-color:#cbd5e1}.sale.visited-sale h3{text-decoration:line-through;text-decoration-thickness:1px}.visited-btn.active{background:#e0e7ff;color:#3730a3}.refresh-status{align-self:center}.compact-btn.active{background:#2563eb;color:#fff}#list.compact-view .sale{padding:10px;margin-top:8px}#list.compact-view .sale h3{margin:2px 0 6px}#list.compact-view .sale p{margin:4px 0}#list.compact-view .sale-photo{max-width:220px;max-height:145px;margin:6px 0 8px}#list.compact-view .actions{gap:6px;margin-top:7px}#list.compact-view .actions button{padding:8px 10px;font-size:14px}.photo-modal{position:fixed;inset:0;background:rgba(0,0,0,.82);display:none;align-items:center;justify-content:center;padding:20px;z-index:9999}.photo-modal.open{display:flex}.photo-modal-inner{position:relative;max-width:min(900px,95vw);max-height:90vh}.photo-modal img{display:block;max-width:100%;max-height:85vh;border-radius:12px;background:#fff}.photo-modal-close{position:absolute;right:-10px;top:-12px;width:44px;height:44px;border-radius:50%;background:#fff;color:#111827;font-size:26px;line-height:1;padding:0;box-shadow:0 3px 12px rgba(0,0,0,.35)}.photo-section{margin-top:16px;padding:16px;border:2px solid #2563eb;border-radius:12px;background:#eff6ff}.photo-title{font-size:20px;font-weight:800;color:#1d4ed8;margin-bottom:6px;display:block}.photo-note{display:block;font-size:14px;color:#475569;margin:6px 0 0}.empty-state{padding:22px;border:2px solid #cbd5e1;border-radius:12px;background:#f8fafc;text-align:center;font-size:22px;font-weight:700;color:#334155;margin-top:12px}.empty-state small{display:block;font-size:14px;font-weight:400;color:#64748b;margin-top:6px}
 @media(max-width:700px){.grid{grid-template-columns:1fr}#map{height:340px}}
 </style>
 </head>
@@ -73,6 +73,7 @@ button{border:0;border-radius:9px;padding:11px 14px;font-weight:700;cursor:point
     <div class="actions">
       <button id="refreshBtn" class="secondary" type="button">↻ Refresh Listings</button>
       <button id="compactViewBtn" class="secondary compact-btn" type="button">Compact View</button>
+      <button id="printListBtn" class="secondary" type="button">🖨 Print My List</button>
       <button id="restoreHidden" class="secondary" type="button" style="display:none">Show Hidden Sales Again</button>
       <span id="refreshStatus" class="muted refresh-status"></span>
     </div>
@@ -130,10 +131,13 @@ let savedOnly=false;
 let photosOnly=false;
 let compactView=false;
 let userLocation=null;
+let lastRenderedSales=[];
 const HIDDEN_KEY='garage_sale_hidden_ids_v1';
 const FAVORITES_KEY='garage_sale_favorite_ids_v1';
+const VISITED_KEY='garage_sale_visited_ids_v1';
 let hiddenIds=[];
 let favoriteIds=[];
+let visitedIds=[];
 try{
   hiddenIds=JSON.parse(localStorage.getItem(HIDDEN_KEY)||'[]');
   if(!Array.isArray(hiddenIds)) hiddenIds=[];
@@ -146,6 +150,13 @@ try{
   if(!Array.isArray(favoriteIds)) favoriteIds=[];
 }catch(e){
   favoriteIds=[];
+}
+
+try{
+  visitedIds=JSON.parse(localStorage.getItem(VISITED_KEY)||'[]');
+  if(!Array.isArray(visitedIds)) visitedIds=[];
+}catch(e){
+  visitedIds=[];
 }
 
 function saveHiddenIds(){
@@ -175,6 +186,25 @@ function toggleFavorite(id){
   render();
 }
 
+function saveVisitedIds(){
+  localStorage.setItem(VISITED_KEY,JSON.stringify(visitedIds));
+}
+
+function isVisited(id){
+  return visitedIds.map(String).includes(String(id));
+}
+
+function toggleVisited(id){
+  const key=String(id);
+  if(isVisited(id)){
+    visitedIds=visitedIds.filter(x=>String(x)!==key);
+  }else{
+    visitedIds.push(key);
+  }
+  saveVisitedIds();
+  render();
+}
+
 const map=L.map('map').setView([39.2461,-94.4191],11);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
   maxZoom:19,
@@ -182,6 +212,7 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
 }).addTo(map);
 
 let markers=[];
+let markerById=new Map();
 
 function esc(s){
   return String(s??'').replace(/[&<>"']/g,c=>({
@@ -269,6 +300,65 @@ async function copyAddress(id){
     console.error(err);
     prompt('Copy this address:',s.address);
   }
+}
+
+function showSaleOnMap(id){
+  const s=sales.find(x=>String(x.id)===String(id));
+  if(!s) return;
+
+  if(!Number.isFinite(s.lat)||!Number.isFinite(s.lon)){
+    alert('This sale could not be placed on the map.');
+    return;
+  }
+
+  map.setView([s.lat,s.lon],15);
+  const marker=markerById.get(String(id));
+  if(marker) marker.openPopup();
+  document.getElementById('map').scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+function printMyList(){
+  if(!lastRenderedSales.length){
+    alert('There are no garage sales in the current list to print.');
+    return;
+  }
+
+  const rows=lastRenderedSales.map((s,index)=>{
+    const dist=saleDistance(s);
+    return `
+      <div class="print-sale">
+        <h2>${index+1}. ${esc(s.address)}</h2>
+        <p><b>Date:</b> ${esc(formatSaleDate(s.date))}</p>
+        ${s.ends_at ? `<p><b>Ends:</b> ${esc(formatEnd(s.ends_at))}</p>` : ''}
+        <p><b>Items:</b> ${esc(s.items)}</p>
+        ${dist!==null ? `<p><b>Distance:</b> ${dist.toFixed(1)} miles away</p>` : ''}
+        <p><b>Status:</b> ${isVisited(s.id)?'Visited':'Not visited'}${isFavorite(s.id)?' • Saved':''}</p>
+      </div>`;
+  }).join('');
+
+  const w=window.open('','_blank','width=850,height=700');
+  if(!w){
+    alert('Your browser blocked the print window. Please allow pop-ups and try again.');
+    return;
+  }
+
+  w.document.write(`<!doctype html>
+    <html><head><meta charset="utf-8"><title>My Garage Sale List</title>
+    <style>
+      body{font-family:Arial,Helvetica,sans-serif;color:#111827;margin:28px}
+      h1{margin-bottom:4px} .sub{color:#475569;margin-bottom:22px}
+      .print-sale{border-top:1px solid #cbd5e1;padding:14px 0}
+      .print-sale h2{font-size:19px;margin:0 0 8px}
+      .print-sale p{margin:4px 0}
+      @media print{body{margin:12mm}}
+    </style></head>
+    <body><h1>My Garage Sale List</h1>
+    <div class="sub">${lastRenderedSales.length} ${lastRenderedSales.length===1?'sale':'sales'}</div>
+    ${rows}
+    </body></html>`);
+  w.document.close();
+  w.focus();
+  setTimeout(()=>w.print(),250);
 }
 
 function requestLocation(){
@@ -431,6 +521,10 @@ function badgeMarkup(s){
     }
   }
 
+  if(isVisited(s.id)){
+    badges.push('<span class="sale-badge badge-visited">VISITED</span>');
+  }
+
   return badges.length ? '<div class="badge-row">'+badges.join('')+'</div>' : '';
 }
 
@@ -466,8 +560,11 @@ function render(){
     filtered.sort((a,b)=>new Date(b.created_at||0).getTime()-new Date(a.created_at||0).getTime());
   }
 
+  lastRenderedSales=filtered.slice();
+
   markers.forEach(m=>map.removeLayer(m));
   markers=[];
+  markerById.clear();
 
   const list=document.getElementById('list');
   list.classList.toggle('compact-view',compactView);
@@ -482,7 +579,7 @@ function render(){
   }
 
   list.innerHTML=filtered.map(s=>`
-    <div class="sale">
+    <div class="sale ${isVisited(s.id)?'visited-sale':''}">
       <h3>${esc(s.address)}</h3>
       ${badgeMarkup(s)}
       <p><b>Date:</b> ${esc(formatSaleDate(s.date))}</p>
@@ -493,7 +590,9 @@ function render(){
       <div class="actions">
         ${s.photo_url ? `<button class="secondary" onclick="openPhoto(${s.id})">View Larger Photo</button>` : ''}
         <button class="primary" onclick="window.open('${directions(s.address)}','_blank')">Get Directions</button>
+        <button class="secondary" onclick="showSaleOnMap(${s.id})">Show on Map</button>
         <button class="secondary favorite-btn ${isFavorite(s.id)?'active':''}" onclick="toggleFavorite(${s.id})">${isFavorite(s.id)?'★ Saved':'☆ Save Sale'}</button>
+        <button class="secondary visited-btn ${isVisited(s.id)?'active':''}" onclick="toggleVisited(${s.id})">${isVisited(s.id)?'✓ Visited':'Mark Visited'}</button>
         <button class="secondary" onclick="shareSale(${s.id})">Share Sale</button>
         <button class="secondary" onclick="copyAddress(${s.id})">Copy Address</button>
         <button class="secondary" onclick="hideSale(${s.id})">Hide From My List</button>
@@ -508,6 +607,7 @@ function render(){
       const m=L.marker([s.lat,s.lon]).addTo(map)
         .bindPopup(`<b>${esc(s.address)}</b><br>${esc(formatSaleDate(s.date))}${endLine}<br>${esc(s.items)}`);
       markers.push(m);
+      markerById.set(String(s.id),m);
       bounds.push([s.lat,s.lon]);
     }
   });
@@ -694,6 +794,7 @@ document.getElementById('search').addEventListener('keydown',e=>{
 });
 document.getElementById('restoreHidden').addEventListener('click',restoreHiddenSales);
 document.getElementById('refreshBtn').addEventListener('click',()=>loadSales(true));
+document.getElementById('printListBtn').addEventListener('click',printMyList);
 document.getElementById('compactViewBtn').addEventListener('click',()=>{
   compactView=!compactView;
   const button=document.getElementById('compactViewBtn');
