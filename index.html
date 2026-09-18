@@ -22,7 +22,7 @@ button{border:0;border-radius:9px;padding:11px 14px;font-weight:700;cursor:point
 .sale{border:1px solid #e5e7eb;border-radius:12px;padding:14px;margin-top:12px}
 .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .muted{color:#64748b;font-size:14px}
-.error{color:#991b1b}.sale-photo{width:100%;max-width:420px;max-height:300px;object-fit:cover;border-radius:10px;margin:8px 0 12px;display:block}.empty-state{padding:22px;border:2px solid #cbd5e1;border-radius:12px;background:#f8fafc;text-align:center;font-size:22px;font-weight:700;color:#334155;margin-top:12px}.empty-state small{display:block;font-size:14px;font-weight:400;color:#64748b;margin-top:6px}
+.error{color:#991b1b}.sale-photo{width:100%;max-width:420px;max-height:300px;object-fit:cover;border-radius:10px;margin:8px 0 12px;display:block}.photo-section{margin-top:16px;padding:16px;border:2px solid #2563eb;border-radius:12px;background:#eff6ff}.photo-title{font-size:20px;font-weight:800;color:#1d4ed8;margin-bottom:6px;display:block}.photo-note{display:block;font-size:14px;color:#475569;margin:6px 0 0}.empty-state{padding:22px;border:2px solid #cbd5e1;border-radius:12px;background:#f8fafc;text-align:center;font-size:22px;font-weight:700;color:#334155;margin-top:12px}.empty-state small{display:block;font-size:14px;font-weight:400;color:#64748b;margin-top:6px}
 @media(max-width:700px){.grid{grid-template-columns:1fr}#map{height:340px}}
 </style>
 </head>
@@ -64,10 +64,11 @@ button{border:0;border-radius:9px;padding:11px 14px;font-weight:700;cursor:point
           <input id="items" required placeholder="Furniture, tools, clothes, toys...">
         </label>
       </div>
-      <label>Photo (optional)
+      <div class="photo-section">
+        <label for="photo" class="photo-title">📷 Add a Photo (Optional)</label>
         <input id="photo" type="file" accept="image/*">
-        <span class="muted">Maximum photo size: 10 MB.</span>
-      </label>
+        <span class="photo-note">A photo helps shoppers see what you have. Maximum photo size: 10 MB.</span>
+      </div>
       <button class="primary" type="submit">Post Garage Sale</button>
     </form>
     <p id="status" class="muted"></p>
