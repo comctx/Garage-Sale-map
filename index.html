@@ -17,7 +17,7 @@ input,textarea{width:100%;padding:11px;border:1px solid #cbd5e1;border-radius:9p
 textarea{min-height:90px}
 button{border:0;border-radius:9px;padding:11px 14px;font-weight:700;cursor:pointer}
 .primary{background:#2563eb;color:#fff}
-.danger{background:#fee2e2;color:#991b1b}
+.danger{background:#fee2e2;color:#991b1b}.secondary{background:#e5e7eb;color:#1f2937}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .sale{border:1px solid #e5e7eb;border-radius:12px;padding:14px;margin-top:12px}
 .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
@@ -37,6 +37,7 @@ button{border:0;border-radius:9px;padding:11px 14px;font-weight:700;cursor:point
 
   <section class="card">
     <h2>Garage Sales</h2>
+    <div class="actions"><button id="restoreHidden" class="secondary" type="button" style="display:none">Show Hidden Sales Again</button></div>
     <div id="list"><p class="muted">Loading garage sales...</p></div>
   </section>
 
@@ -74,6 +75,23 @@ const SUPABASE_KEY='sb_publishable_DaHk2sr-fSYJBCBt8vOesw_HDRrbPBF';
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
 let sales=[];
+const HIDDEN_KEY='garage_sale_hidden_ids_v1';
+let hiddenIds=[];
+try{
+  hiddenIds=JSON.parse(localStorage.getItem(HIDDEN_KEY)||'[]');
+  if(!Array.isArray(hiddenIds)) hiddenIds=[];
+}catch(e){
+  hiddenIds=[];
+}
+
+function saveHiddenIds(){
+  localStorage.setItem(HIDDEN_KEY,JSON.stringify(hiddenIds));
+}
+
+function isHidden(id){
+  return hiddenIds.map(String).includes(String(id));
+}
+
 const map=L.map('map').setView([39.2461,-94.4191],11);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
   maxZoom:19,
@@ -132,12 +150,15 @@ function render(){
   const q=document.getElementById('search').value.trim().toLowerCase();
   const filtered=sales
     .filter(isActive)
+    .filter(s=>!isHidden(s.id))
     .filter(s=>[s.address,s.date,s.items].join(' ').toLowerCase().includes(q));
 
   markers.forEach(m=>map.removeLayer(m));
   markers=[];
 
   const list=document.getElementById('list');
+  const restoreButton=document.getElementById('restoreHidden');
+  restoreButton.style.display=hiddenIds.length ? 'inline-block' : 'none';
 
   if(!filtered.length){
     list.innerHTML='<p class="muted">No garage sales found.</p>';
@@ -152,7 +173,7 @@ function render(){
       <p><b>Items:</b> ${esc(s.items)}</p>
       <div class="actions">
         <button class="primary" onclick="window.open('${directions(s.address)}','_blank')">Get Directions</button>
-        <button class="danger" onclick="removeSale(${s.id})">Delete / Sale Is Over</button>
+        <button class="secondary" onclick="hideSale(${s.id})">Hide From My List</button>
       </div>
     </div>
   `).join('');
@@ -261,29 +282,29 @@ async function addSale(e){
     : 'Garage sale posted. It will expire automatically, but the address could not be placed on the map.';
 }
 
-async function removeSale(id){
-  const sale=sales.find(s=>s.id===id);
+function hideSale(id){
+  const sale=sales.find(s=>String(s.id)===String(id));
   const label=sale?.address ? `\n\n${sale.address}` : '';
-  const ok=confirm('Remove this garage sale for everyone? Use this only if the sale is over or no longer active.'+label);
+  const ok=confirm('Hide this garage sale from your list? This only hides it for you and does not remove it for anyone else.'+label);
   if(!ok) return;
 
-  const {error}=await db
-    .from('garage_sales')
-    .delete()
-    .eq('id',id);
-
-  if(error){
-    console.error(error);
-    alert('Could not remove the garage sale. Please try again.');
-    return;
+  if(!isHidden(id)){
+    hiddenIds.push(String(id));
+    saveHiddenIds();
   }
-
-  sales=sales.filter(s=>s.id!==id);
   render();
 }
 
+function restoreHiddenSales(){
+  hiddenIds=[];
+  saveHiddenIds();
+  render();
+}
+
+
 document.getElementById('form').addEventListener('submit',addSale);
 document.getElementById('search').addEventListener('input',render);
+document.getElementById('restoreHidden').addEventListener('click',restoreHiddenSales);
 setInterval(render,60000);
 loadSales();
 </script>
