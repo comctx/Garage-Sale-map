@@ -59,7 +59,9 @@ button{border:0;border-radius:9px;padding:11px 14px;font-weight:700;cursor:point
         </label>
         <label>Items
           <input id="items" required placeholder="Furniture, tools, clothes, toys...">
-        </label>
+        </label>const SUPABASE_URL='https://wfdvaqzdqthwnarbmwns.supabase.co';
+const SUPABASE_KEY='sb_publishable_DaHk2sr-fSYJBCBt8vOesw_HDRrbPBF';
+const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
       </div>
       <button class="primary" type="submit">Post Garage Sale</button>
     </form>
@@ -226,6 +228,7 @@ async function addSale(e){
 
   const address=document.getElementById('address').value.trim();
   const date=document.getElementById('date').value.trim();
+  const photofile=document.getElementbyld("photo").files{0};
   const items=document.getElementById('items').value.trim();
   const endsRaw=document.getElementById('ends').value;
   const status=document.getElementById('status');
