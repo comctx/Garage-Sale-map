@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Garage Sale Map</title>
+<title>Garage Sale Finder</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
 body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f3f4f6;color:#1f2937}
@@ -27,7 +27,7 @@ button{border:0;border-radius:9px;padding:11px 14px;font-weight:700;cursor:point
 </style>
 </head>
 <body>
-<header><h1>Garage Sale Map</h1><div>Find nearby garage sales or post your own.</div></header>
+<header><h1>Garage Sale Finder</h1><div>Find nearby garage sales or post your own.</div></header>
 
 <div class="wrap">
   <section class="card">
@@ -59,9 +59,8 @@ button{border:0;border-radius:9px;padding:11px 14px;font-weight:700;cursor:point
         </label>
         <label>Items
           <input id="items" required placeholder="Furniture, tools, clothes, toys...">
+        </label>
       </div>
-     <label 4="photo" style="font-weight: bold;">Add a Garage Sale Photo:</label>
-      <input type=file id="photo" accept="image/star">
       <button class="primary" type="submit">Post Garage Sale</button>
     </form>
     <p id="status" class="muted"></p>
