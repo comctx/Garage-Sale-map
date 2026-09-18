@@ -41,19 +41,24 @@ button{border:0;border-radius:9px;padding:11px 14px;font-weight:700;cursor:point
 
   <section class="card">
     <h2>Post a Garage Sale</h2>
-    <p class="muted">Sales are shared online so other visitors can find them.</p>
+    <p class="muted">Sales automatically disappear after their ending time.</p>
     <form id="form">
       <div class="grid">
         <label>Address
           <input id="address" required placeholder="123 Main St, City, State ZIP">
         </label>
-        <label>Date
+        <label>Sale Date
           <input id="date" required placeholder="Saturday, Sept. 20">
         </label>
       </div>
-      <label>Items
-        <textarea id="items" required placeholder="Furniture, tools, clothes, toys..."></textarea>
-      </label>
+      <div class="grid">
+        <label>Ends
+          <input id="ends" type="datetime-local" required>
+        </label>
+        <label>Items
+          <input id="items" required placeholder="Furniture, tools, clothes, toys...">
+        </label>
+      </div>
       <button class="primary" type="submit">Post Garage Sale</button>
     </form>
     <p id="status" class="muted"></p>
@@ -86,6 +91,31 @@ function directions(a){
   return 'https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent(a);
 }
 
+function formatEnd(iso){
+  if(!iso) return '';
+  const d=new Date(iso);
+  if(Number.isNaN(d.getTime())) return '';
+  return d.toLocaleString();
+}
+
+function isActive(row){
+  const now=Date.now();
+
+  if(row.ends_at){
+    const end=new Date(row.ends_at).getTime();
+    return Number.isFinite(end) && end > now;
+  }
+
+  // Older listings created before the Ends field existed stay visible
+  // for at most 48 hours from creation.
+  if(row.created_at){
+    const created=new Date(row.created_at).getTime();
+    return Number.isFinite(created) && created + (48*60*60*1000) > now;
+  }
+
+  return false;
+}
+
 function normalizeSale(row){
   return {
     id: row.id,
@@ -93,15 +123,17 @@ function normalizeSale(row){
     date: row.date || '',
     items: row.items || '',
     lat: row.latitude == null ? null : Number(row.latitude),
-    lon: row.longitude == null ? null : Number(row.longitude)
+    lon: row.longitude == null ? null : Number(row.longitude),
+    created_at: row.created_at || null,
+    ends_at: row.ends_at || null
   };
 }
 
 function render(){
   const q=document.getElementById('search').value.trim().toLowerCase();
-  const filtered=sales.filter(s=>
-    [s.address,s.date,s.items].join(' ').toLowerCase().includes(q)
-  );
+  const filtered=sales
+    .filter(isActive)
+    .filter(s=>[s.address,s.date,s.items].join(' ').toLowerCase().includes(q));
 
   markers.forEach(m=>map.removeLayer(m));
   markers=[];
@@ -117,6 +149,7 @@ function render(){
     <div class="sale">
       <h3>${esc(s.address)}</h3>
       <p><b>Date:</b> ${esc(s.date)}</p>
+      ${s.ends_at ? `<p><b>Ends:</b> ${esc(formatEnd(s.ends_at))}</p>` : ''}
       <p><b>Items:</b> ${esc(s.items)}</p>
       <div class="actions">
         <button class="primary" onclick="window.open('${directions(s.address)}','_blank')">Get Directions</button>
@@ -127,8 +160,9 @@ function render(){
   const bounds=[];
   filtered.forEach(s=>{
     if(Number.isFinite(s.lat)&&Number.isFinite(s.lon)){
+      const endLine=s.ends_at ? `<br><b>Ends:</b> ${esc(formatEnd(s.ends_at))}` : '';
       const m=L.marker([s.lat,s.lon]).addTo(map)
-        .bindPopup(`<b>${esc(s.address)}</b><br>${esc(s.date)}<br>${esc(s.items)}`);
+        .bindPopup(`<b>${esc(s.address)}</b><br>${esc(s.date)}${endLine}<br>${esc(s.items)}`);
       markers.push(m);
       bounds.push([s.lat,s.lon]);
     }
@@ -142,7 +176,7 @@ async function loadSales(){
   const list=document.getElementById('list');
   const {data,error}=await db
     .from('garage_sales')
-    .select('id,address,date,items,latitude,longitude,created_at')
+    .select('id,address,date,items,latitude,longitude,created_at,ends_at')
     .order('created_at',{ascending:false});
 
   if(error){
@@ -172,8 +206,16 @@ async function addSale(e){
   const address=document.getElementById('address').value.trim();
   const date=document.getElementById('date').value.trim();
   const items=document.getElementById('items').value.trim();
+  const endsRaw=document.getElementById('ends').value;
   const status=document.getElementById('status');
   const button=e.target.querySelector('button[type="submit"]');
+
+  const endsDate=new Date(endsRaw);
+  if(Number.isNaN(endsDate.getTime()) || endsDate.getTime() <= Date.now()){
+    status.classList.add('error');
+    status.textContent='Please choose an ending time in the future.';
+    return;
+  }
 
   status.classList.remove('error');
   status.textContent='Finding address on map...';
@@ -195,9 +237,10 @@ async function addSale(e){
       date,
       items,
       latitude:loc.lat,
-      longitude:loc.lon
+      longitude:loc.lon,
+      ends_at:endsDate.toISOString()
     })
-    .select('id,address,date,items,latitude,longitude,created_at')
+    .select('id,address,date,items,latitude,longitude,created_at,ends_at')
     .single();
 
   button.disabled=false;
@@ -214,12 +257,16 @@ async function addSale(e){
   render();
 
   status.textContent=Number.isFinite(loc.lat)&&Number.isFinite(loc.lon)
-    ? 'Garage sale posted and added to the map.'
-    : 'Garage sale posted. The address could not be placed on the map, but Get Directions will still work.';
+    ? 'Garage sale posted. It will automatically disappear after the ending time.'
+    : 'Garage sale posted. It will expire automatically, but the address could not be placed on the map.';
 }
 
 document.getElementById('form').addEventListener('submit',addSale);
 document.getElementById('search').addEventListener('input',render);
+
+// Re-check expiration every minute while the page is open.
+setInterval(render,60000);
+
 loadSales();
 </script>
 </body>
