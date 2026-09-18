@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -18,7 +19,7 @@ textarea{min-height:90px}
 button{border:0;border-radius:9px;padding:11px 14px;font-weight:700;cursor:pointer}
 .primary{background:#2563eb;color:#fff}
 .danger{background:#fee2e2;color:#991b1b}.secondary{background:#e5e7eb;color:#1f2937}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.search-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end}.search-row button{min-width:110px}.filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.filter-btn{background:#e5e7eb;color:#1f2937}.filter-btn.active{background:#2563eb;color:#fff}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.search-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end}.search-row button{min-width:110px}.filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:center}.filter-btn{background:#e5e7eb;color:#1f2937}.filter-btn.active{background:#2563eb;color:#fff}.distance-select{min-height:41px;padding:9px 10px;border:1px solid #cbd5e1;border-radius:9px;background:white;color:#1f2937;font-weight:700}.favorite-btn.active{background:#fef3c7;color:#92400e}.distance-label{font-size:14px;font-weight:700;color:#475569}
 .sale{border:1px solid #e5e7eb;border-radius:12px;padding:14px;margin-top:12px}
 .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .muted{color:#64748b;font-size:14px}
@@ -40,6 +41,19 @@ button{border:0;border-radius:9px;padding:11px 14px;font-weight:700;cursor:point
       <button class="filter-btn" type="button" data-filter="today">Today</button>
       <button class="filter-btn" type="button" data-filter="tomorrow">Tomorrow</button>
       <button class="filter-btn" type="button" data-filter="weekend">This Weekend</button>
+      <button id="savedOnlyBtn" class="filter-btn" type="button">★ Saved Sales</button>
+    </div>
+    <div class="filter-row" aria-label="Distance filter">
+      <button id="useLocationBtn" class="secondary" type="button">📍 Use My Location</button>
+      <span class="distance-label">Show within</span>
+      <select id="distanceFilter" class="distance-select" disabled>
+        <option value="all">Any Distance</option>
+        <option value="5">5 miles</option>
+        <option value="10">10 miles</option>
+        <option value="25">25 miles</option>
+        <option value="50">50 miles</option>
+      </select>
+      <span id="locationStatus" class="muted">Location not set.</span>
     </div>
     <div id="map"></div>
   </section>
@@ -90,13 +104,24 @@ const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
 let sales=[];
 let dateFilter='all';
+let savedOnly=false;
+let userLocation=null;
 const HIDDEN_KEY='garage_sale_hidden_ids_v1';
+const FAVORITES_KEY='garage_sale_favorite_ids_v1';
 let hiddenIds=[];
+let favoriteIds=[];
 try{
   hiddenIds=JSON.parse(localStorage.getItem(HIDDEN_KEY)||'[]');
   if(!Array.isArray(hiddenIds)) hiddenIds=[];
 }catch(e){
   hiddenIds=[];
+}
+
+try{
+  favoriteIds=JSON.parse(localStorage.getItem(FAVORITES_KEY)||'[]');
+  if(!Array.isArray(favoriteIds)) favoriteIds=[];
+}catch(e){
+  favoriteIds=[];
 }
 
 function saveHiddenIds(){
@@ -105,6 +130,25 @@ function saveHiddenIds(){
 
 function isHidden(id){
   return hiddenIds.map(String).includes(String(id));
+}
+
+function saveFavoriteIds(){
+  localStorage.setItem(FAVORITES_KEY,JSON.stringify(favoriteIds));
+}
+
+function isFavorite(id){
+  return favoriteIds.map(String).includes(String(id));
+}
+
+function toggleFavorite(id){
+  const key=String(id);
+  if(isFavorite(id)){
+    favoriteIds=favoriteIds.filter(x=>String(x)!==key);
+  }else{
+    favoriteIds.push(key);
+  }
+  saveFavoriteIds();
+  render();
 }
 
 const map=L.map('map').setView([39.2461,-94.4191],11);
@@ -123,6 +167,71 @@ function esc(s){
 
 function directions(a){
   return 'https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent(a);
+}
+
+function milesBetween(lat1,lon1,lat2,lon2){
+  const toRad=x=>x*Math.PI/180;
+  const R=3958.8;
+  const dLat=toRad(lat2-lat1);
+  const dLon=toRad(lon2-lon1);
+  const a=Math.sin(dLat/2)**2+
+    Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2;
+  return 2*R*Math.asin(Math.sqrt(a));
+}
+
+function saleDistance(s){
+  if(!userLocation||!Number.isFinite(s.lat)||!Number.isFinite(s.lon)) return null;
+  return milesBetween(userLocation.lat,userLocation.lon,s.lat,s.lon);
+}
+
+async function shareSale(id){
+  const s=sales.find(x=>String(x.id)===String(id));
+  if(!s) return;
+
+  const text=[
+    'Garage Sale',
+    s.address,
+    'Date: '+formatSaleDate(s.date),
+    s.ends_at ? 'Ends: '+formatEnd(s.ends_at) : '',
+    'Items: '+s.items,
+    'Directions: '+directions(s.address)
+  ].filter(Boolean).join('\n');
+
+  try{
+    if(navigator.share){
+      await navigator.share({title:'Garage Sale',text});
+    }else if(navigator.clipboard){
+      await navigator.clipboard.writeText(text);
+      alert('Garage sale details copied. You can paste them into a text or email.');
+    }else{
+      prompt('Copy these garage sale details:',text);
+    }
+  }catch(err){
+    if(err?.name!=='AbortError') console.error(err);
+  }
+}
+
+function requestLocation(){
+  const status=document.getElementById('locationStatus');
+  const select=document.getElementById('distanceFilter');
+  if(!navigator.geolocation){
+    status.textContent='Location is not available in this browser.';
+    return;
+  }
+
+  status.textContent='Finding your location...';
+  navigator.geolocation.getCurrentPosition(
+    pos=>{
+      userLocation={lat:pos.coords.latitude,lon:pos.coords.longitude};
+      select.disabled=false;
+      status.textContent='Location ready.';
+      render();
+    },
+    ()=>{
+      status.textContent='Location permission was not granted.';
+    },
+    {enableHighAccuracy:false,timeout:10000,maximumAge:300000}
+  );
 }
 
 function formatEnd(iso){
@@ -249,6 +358,13 @@ function render(){
     .filter(isActive)
     .filter(s=>!isHidden(s.id))
     .filter(matchesDateFilter)
+    .filter(s=>!savedOnly||isFavorite(s.id))
+    .filter(s=>{
+      const selected=document.getElementById('distanceFilter').value;
+      if(selected==='all'||!userLocation) return true;
+      const d=saleDistance(s);
+      return d!==null&&d<=Number(selected);
+    })
     .filter(s=>[s.address,s.date,s.items].join(' ').toLowerCase().includes(q));
 
   markers.forEach(m=>map.removeLayer(m));
@@ -259,7 +375,7 @@ function render(){
   restoreButton.style.display=hiddenIds.length ? 'inline-block' : 'none';
 
   if(!filtered.length){
-    list.innerHTML='<div class="empty-state">No Garage Sales Found<small>Try a different address, item, or ZIP code.</small></div>';
+    list.innerHTML='<div class="empty-state">No Garage Sales Found<small>Try changing the search, date, saved, or distance filter.</small></div>';
     return;
   }
 
@@ -269,9 +385,12 @@ function render(){
       <p><b>Date:</b> ${esc(formatSaleDate(s.date))}</p>
       ${s.ends_at ? `<p><b>Ends:</b> ${esc(formatEnd(s.ends_at))}</p>` : ''}
       <p><b>Items:</b> ${esc(s.items)}</p>
+      ${saleDistance(s)!==null ? `<p><b>Distance:</b> ${saleDistance(s).toFixed(1)} miles away</p>` : ''}
       ${s.photo_url ? `<img class="sale-photo" src="${esc(s.photo_url)}" alt="Garage sale photo" loading="lazy">` : ''}
       <div class="actions">
         <button class="primary" onclick="window.open('${directions(s.address)}','_blank')">Get Directions</button>
+        <button class="secondary favorite-btn ${isFavorite(s.id)?'active':''}" onclick="toggleFavorite(${s.id})">${isFavorite(s.id)?'★ Saved':'☆ Save Sale'}</button>
+        <button class="secondary" onclick="shareSale(${s.id})">Share Sale</button>
         <button class="secondary" onclick="hideSale(${s.id})">Hide From My List</button>
       </div>
     </div>
@@ -451,10 +570,17 @@ document.getElementById('search').addEventListener('keydown',e=>{
   }
 });
 document.getElementById('restoreHidden').addEventListener('click',restoreHiddenSales);
-document.querySelectorAll('.filter-btn').forEach(button=>{
+document.getElementById('useLocationBtn').addEventListener('click',requestLocation);
+document.getElementById('distanceFilter').addEventListener('change',render);
+document.getElementById('savedOnlyBtn').addEventListener('click',()=>{
+  savedOnly=!savedOnly;
+  document.getElementById('savedOnlyBtn').classList.toggle('active',savedOnly);
+  render();
+});
+document.querySelectorAll('.filter-btn[data-filter]').forEach(button=>{
   button.addEventListener('click',()=>{
     dateFilter=button.dataset.filter||'all';
-    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b===button));
+    document.querySelectorAll('.filter-btn[data-filter]').forEach(b=>b.classList.toggle('active',b===button));
     render();
   });
 });
