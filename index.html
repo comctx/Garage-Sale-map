@@ -22,7 +22,7 @@ button{border:0;border-radius:9px;padding:11px 14px;font-weight:700;cursor:point
 .sale{border:1px solid #e5e7eb;border-radius:12px;padding:14px;margin-top:12px}
 .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .muted{color:#64748b;font-size:14px}
-.error{color:#991b1b}.sale-photo{width:100%;max-width:420px;max-height:300px;object-fit:cover;border-radius:10px;margin:8px 0 12px;display:block;cursor:pointer}.results-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.result-count{font-weight:700;color:#475569}.badge-row{display:flex;gap:7px;flex-wrap:wrap;margin:4px 0 8px}.sale-badge{display:inline-block;padding:5px 8px;border-radius:999px;font-size:12px;font-weight:800}.badge-new{background:#dcfce7;color:#166534}.badge-ending{background:#fee2e2;color:#991b1b}.badge-visited{background:#e0e7ff;color:#3730a3}.sale.visited-sale{background:#f8fafc;border-color:#cbd5e1}.sale.visited-sale h3{text-decoration:line-through;text-decoration-thickness:1px}.visited-btn.active{background:#e0e7ff;color:#3730a3}.hide-visited-btn.active{background:#2563eb;color:#fff}.personal-note{margin:8px 0;padding:9px 11px;border-left:4px solid #d4af37;border-radius:7px;background:#fffbeb;color:#713f12}.note-btn.active{background:#fef3c7;color:#92400e}.refresh-status{align-self:center}.compact-btn.active{background:#2563eb;color:#fff}#list.compact-view .sale{padding:10px;margin-top:8px}#list.compact-view .sale h3{margin:2px 0 6px}#list.compact-view .sale p{margin:4px 0}#list.compact-view .sale-photo{max-width:220px;max-height:145px;margin:6px 0 8px}#list.compact-view .actions{gap:6px;margin-top:7px}#list.compact-view .actions button{padding:8px 10px;font-size:14px}.photo-modal{position:fixed;inset:0;background:rgba(0,0,0,.82);display:none;align-items:center;justify-content:center;padding:20px;z-index:9999}.photo-modal.open{display:flex}.photo-modal-inner{position:relative;max-width:min(900px,95vw);max-height:90vh}.photo-modal img{display:block;max-width:100%;max-height:85vh;border-radius:12px;background:#fff}.photo-modal-close{position:absolute;right:-10px;top:-12px;width:44px;height:44px;border-radius:50%;background:#fff;color:#111827;font-size:26px;line-height:1;padding:0;box-shadow:0 3px 12px rgba(0,0,0,.35)}.photo-section{margin-top:16px;padding:16px;border:2px solid #2563eb;border-radius:12px;background:#eff6ff}.photo-title{font-size:20px;font-weight:800;color:#1d4ed8;margin-bottom:6px;display:block}.photo-note{display:block;font-size:14px;color:#475569;margin:6px 0 0}.empty-state{padding:22px;border:2px solid #cbd5e1;border-radius:12px;background:#f8fafc;text-align:center;font-size:22px;font-weight:700;color:#334155;margin-top:12px}.empty-state small{display:block;font-size:14px;font-weight:400;color:#64748b;margin-top:6px}
+.error{color:#991b1b}.sale-photo{width:100%;height:150px;object-fit:cover;border-radius:10px;display:block;cursor:pointer}.sale-photo-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;max-width:620px;margin:8px 0 12px}.sale-photo-count{font-size:13px;color:#64748b;margin-top:5px}.open-now-btn.active{background:#16a34a;color:#fff}.badge-open{background:#dcfce7;color:#166534}.badge-my-sale{background:#dbeafe;color:#1d4ed8}.owner-btn{background:#dbeafe;color:#1d4ed8}.end-sale-btn{background:#fee2e2;color:#991b1b}.photo-nav{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.92);font-size:28px;padding:0;z-index:2}.photo-prev{left:8px}.photo-next{right:8px}.photo-counter{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);background:rgba(0,0,0,.65);color:#fff;padding:5px 9px;border-radius:999px;font-size:13px}.setup-note{margin:10px 0;padding:10px 12px;border-radius:9px;background:#eff6ff;color:#1e40af;font-size:14px}.results-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.result-count{font-weight:700;color:#475569}.badge-row{display:flex;gap:7px;flex-wrap:wrap;margin:4px 0 8px}.sale-badge{display:inline-block;padding:5px 8px;border-radius:999px;font-size:12px;font-weight:800}.badge-new{background:#dcfce7;color:#166534}.badge-ending{background:#fee2e2;color:#991b1b}.badge-visited{background:#e0e7ff;color:#3730a3}.sale.visited-sale{background:#f8fafc;border-color:#cbd5e1}.sale.visited-sale h3{text-decoration:line-through;text-decoration-thickness:1px}.visited-btn.active{background:#e0e7ff;color:#3730a3}.hide-visited-btn.active{background:#2563eb;color:#fff}.personal-note{margin:8px 0;padding:9px 11px;border-left:4px solid #d4af37;border-radius:7px;background:#fffbeb;color:#713f12}.note-btn.active{background:#fef3c7;color:#92400e}.refresh-status{align-self:center}.compact-btn.active{background:#2563eb;color:#fff}#list.compact-view .sale{padding:10px;margin-top:8px}#list.compact-view .sale h3{margin:2px 0 6px}#list.compact-view .sale p{margin:4px 0}#list.compact-view .sale-photo{height:100px}#list.compact-view .sale-photo-grid{grid-template-columns:repeat(auto-fit,minmax(95px,1fr));max-width:440px;margin:6px 0 8px}#list.compact-view .actions{gap:6px;margin-top:7px}#list.compact-view .actions button{padding:8px 10px;font-size:14px}.photo-modal{position:fixed;inset:0;background:rgba(0,0,0,.82);display:none;align-items:center;justify-content:center;padding:20px;z-index:9999}.photo-modal.open{display:flex}.photo-modal-inner{position:relative;max-width:min(900px,95vw);max-height:90vh}.photo-modal img{display:block;max-width:100%;max-height:85vh;border-radius:12px;background:#fff}.photo-modal-close{position:absolute;right:-10px;top:-12px;width:44px;height:44px;border-radius:50%;background:#fff;color:#111827;font-size:26px;line-height:1;padding:0;box-shadow:0 3px 12px rgba(0,0,0,.35)}.photo-section{margin-top:16px;padding:16px;border:2px solid #2563eb;border-radius:12px;background:#eff6ff}.photo-title{font-size:20px;font-weight:800;color:#1d4ed8;margin-bottom:6px;display:block}.photo-note{display:block;font-size:14px;color:#475569;margin:6px 0 0}.empty-state{padding:22px;border:2px solid #cbd5e1;border-radius:12px;background:#f8fafc;text-align:center;font-size:22px;font-weight:700;color:#334155;margin-top:12px}.empty-state small{display:block;font-size:14px;font-weight:400;color:#64748b;margin-top:6px}
 @media(max-width:700px){.grid{grid-template-columns:1fr}#map{height:340px}}
 </style>
 </head>
@@ -40,6 +40,7 @@ button{border:0;border-radius:9px;padding:11px 14px;font-weight:700;cursor:point
       <button class="filter-btn" type="button" data-filter="today">Today</button>
       <button class="filter-btn" type="button" data-filter="tomorrow">Tomorrow</button>
       <button class="filter-btn" type="button" data-filter="weekend">This Weekend</button>
+      <button id="openNowBtn" class="filter-btn open-now-btn" type="button">Open Now</button>
       <button id="savedOnlyBtn" class="filter-btn" type="button">★ Saved Sales</button>
       <button id="hideVisitedBtn" class="filter-btn hide-visited-btn" type="button">Hide Visited</button>
     </div>
@@ -109,18 +110,22 @@ button{border:0;border-radius:9px;padding:11px 14px;font-weight:700;cursor:point
         </label>
       </div>
       <div class="grid">
+        <label>Starts At
+          <input id="startTime" type="time" required>
+        </label>
         <label>Ends
           <input id="ends" type="datetime-local" required>
         </label>
-        <label>Items
-          <input id="items" required placeholder="Furniture, tools, clothes, toys...">
-        </label>
       </div>
+      <label>Items
+        <input id="items" required placeholder="Furniture, tools, clothes, toys...">
+      </label>
       <div class="photo-section">
-        <label for="photo" class="photo-title">📷 Add a Photo (Optional)</label>
-        <input id="photo" type="file" accept="image/*">
-        <span class="photo-note">A photo helps shoppers see what you have. Maximum photo size: 10 MB.</span>
+        <label for="photo" class="photo-title">📷 Add Photos (Optional)</label>
+        <input id="photo" type="file" accept="image/*" multiple>
+        <span class="photo-note">Add up to 5 photos. Maximum size: 10 MB per photo.</span>
       </div>
+      <div class="setup-note">Sales posted with this version can be edited or ended early from the same browser/device that posted them.</div>
       <button class="primary" type="submit">Post Garage Sale</button>
     </form>
     <p id="status" class="muted"></p>
@@ -130,7 +135,10 @@ button{border:0;border-radius:9px;padding:11px 14px;font-weight:700;cursor:point
 <div id="photoModal" class="photo-modal" role="dialog" aria-modal="true" aria-label="Garage sale photo" onclick="if(event.target===this)closePhoto()">
   <div class="photo-modal-inner">
     <button class="photo-modal-close" type="button" aria-label="Close photo" onclick="closePhoto()">×</button>
+    <button id="photoPrev" class="photo-nav photo-prev" type="button" aria-label="Previous photo" onclick="changePhoto(-1)">‹</button>
     <img id="modalPhoto" src="" alt="Garage sale photo">
+    <button id="photoNext" class="photo-nav photo-next" type="button" aria-label="Next photo" onclick="changePhoto(1)">›</button>
+    <div id="photoCounter" class="photo-counter"></div>
   </div>
 </div>
 
@@ -144,6 +152,7 @@ const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 let sales=[];
 let dateFilter='all';
 let categoryFilter='all';
+let openNowOnly=false;
 let savedOnly=false;
 let photosOnly=false;
 let hideVisited=false;
@@ -156,10 +165,14 @@ const FAVORITES_KEY='garage_sale_favorite_ids_v1';
 const VISITED_KEY='garage_sale_visited_ids_v1';
 const NOTES_KEY='garage_sale_personal_notes_v1';
 const UI_SETTINGS_KEY='garage_sale_ui_settings_v1';
+const MY_SALES_KEY='garage_sale_my_sale_tokens_v1';
 let hiddenIds=[];
 let favoriteIds=[];
 let visitedIds=[];
 let personalNotes={};
+let mySaleTokens={};
+let modalSaleId=null;
+let modalPhotoIndex=0;
 try{
   hiddenIds=JSON.parse(localStorage.getItem(HIDDEN_KEY)||'[]');
   if(!Array.isArray(hiddenIds)) hiddenIds=[];
@@ -186,6 +199,21 @@ try{
   if(!personalNotes || Array.isArray(personalNotes) || typeof personalNotes!=='object') personalNotes={};
 }catch(e){
   personalNotes={};
+}
+
+try{
+  mySaleTokens=JSON.parse(localStorage.getItem(MY_SALES_KEY)||'{}');
+  if(!mySaleTokens || Array.isArray(mySaleTokens) || typeof mySaleTokens!=='object') mySaleTokens={};
+}catch(e){
+  mySaleTokens={};
+}
+
+function saveMySaleTokens(){
+  localStorage.setItem(MY_SALES_KEY,JSON.stringify(mySaleTokens));
+}
+
+function ownsSale(id){
+  return Boolean(mySaleTokens[String(id)]);
 }
 
 function saveHiddenIds(){
@@ -280,6 +308,7 @@ function saveUiSettings(){
       search:document.getElementById('search')?.value||'',
       dateFilter,
       categoryFilter,
+      openNowOnly,
       savedOnly,
       photosOnly,
       hideVisited,
@@ -316,6 +345,7 @@ function restoreUiSettings(){
     if(['all','today','tomorrow','weekend'].includes(saved.dateFilter)) dateFilter=saved.dateFilter;
     if(['all','tools','furniture','clothes','toys'].includes(saved.categoryFilter)) categoryFilter=saved.categoryFilter;
 
+    openNowOnly=saved.openNowOnly===true;
     savedOnly=saved.savedOnly===true;
     photosOnly=saved.photosOnly===true;
     hideVisited=saved.hideVisited===true;
@@ -326,6 +356,7 @@ function restoreUiSettings(){
       document.getElementById('sortChoice').value=saved.sortChoice;
     }
 
+    document.getElementById('openNowBtn').classList.toggle('active',openNowOnly);
     document.getElementById('savedOnlyBtn').classList.toggle('active',savedOnly);
     document.getElementById('photosOnlyBtn').classList.toggle('active',photosOnly);
     document.getElementById('hideVisitedBtn').classList.toggle('active',hideVisited);
@@ -344,6 +375,152 @@ function restoreUiSettings(){
 
     applyViewMode();
   }catch(e){}
+}
+
+function randomToken(){
+  const bytes=new Uint8Array(24);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+async function sha256Hex(value){
+  const bytes=new TextEncoder().encode(value);
+  const digest=await crypto.subtle.digest('SHA-256',bytes);
+  return Array.from(new Uint8Array(digest),b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+function localDateInputFromIso(iso){
+  if(!iso) return '';
+  const d=new Date(iso);
+  if(Number.isNaN(d.getTime())) return '';
+  const pad=n=>String(n).padStart(2,'0');
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+}
+
+function localTimeInputFromIso(iso){
+  if(!iso) return '';
+  const d=new Date(iso);
+  if(Number.isNaN(d.getTime())) return '';
+  const pad=n=>String(n).padStart(2,'0');
+  return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function localDateTimeInputFromIso(iso){
+  if(!iso) return '';
+  const d=new Date(iso);
+  if(Number.isNaN(d.getTime())) return '';
+  const pad=n=>String(n).padStart(2,'0');
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function formatStart(iso){
+  if(!iso) return '';
+  const d=new Date(iso);
+  if(Number.isNaN(d.getTime())) return '';
+  return d.toLocaleString([],{
+    weekday:'short',month:'short',day:'numeric',
+    hour:'numeric',minute:'2-digit'
+  });
+}
+
+function isOpenNow(s){
+  if(!s.start_at || !s.ends_at) return false;
+  const start=new Date(s.start_at).getTime();
+  const end=new Date(s.ends_at).getTime();
+  const now=Date.now();
+  return Number.isFinite(start)&&Number.isFinite(end)&&start<=now&&now<end;
+}
+
+async function editMySale(id){
+  const s=sales.find(x=>String(x.id)===String(id));
+  const token=mySaleTokens[String(id)];
+  if(!s||!token) return;
+
+  const address=prompt('Edit address:',s.address);
+  if(address===null) return;
+  const cleanAddress=address.trim();
+  if(!cleanAddress) return alert('Address cannot be blank.');
+
+  const date=prompt('Edit sale date (YYYY-MM-DD):',s.date||localDateInputFromIso(s.start_at));
+  if(date===null) return;
+
+  const startTime=prompt('Edit start time (HH:MM):',localTimeInputFromIso(s.start_at));
+  if(startTime===null) return;
+
+  const ends=prompt('Edit ending date/time (YYYY-MM-DDTHH:MM):',localDateTimeInputFromIso(s.ends_at));
+  if(ends===null) return;
+
+  const items=prompt('Edit items:',s.items);
+  if(items===null) return;
+
+  const startDate=new Date(`${date}T${startTime}`);
+  const endsDate=new Date(ends);
+  if(Number.isNaN(startDate.getTime())||Number.isNaN(endsDate.getTime())||endsDate<=startDate){
+    alert('Please make sure the start and ending times are valid, and the ending time is after the start time.');
+    return;
+  }
+
+  let loc={lat:s.lat,lon:s.lon};
+  if(cleanAddress!==s.address){
+    try{ loc=await geocode(cleanAddress); }catch(err){ console.warn(err); }
+  }
+
+  const {data,error}=await db.rpc('edit_garage_sale',{
+    p_id:String(id),
+    p_token:token,
+    p_address:cleanAddress,
+    p_date:date.trim(),
+    p_items:items.trim(),
+    p_latitude:Number.isFinite(loc.lat)?loc.lat:null,
+    p_longitude:Number.isFinite(loc.lon)?loc.lon:null,
+    p_start_at:startDate.toISOString(),
+    p_ends_at:endsDate.toISOString()
+  });
+
+  if(error){
+    console.error(error);
+    alert('Could not edit this sale. Make sure the one-time Supabase setup has been run.');
+    return;
+  }
+
+  if(!data||!data.length){
+    alert('This sale could not be edited from this device.');
+    return;
+  }
+
+  const updated=normalizeSale(data[0]);
+  const index=sales.findIndex(x=>String(x.id)===String(id));
+  if(index>=0) sales[index]=updated;
+  render();
+  alert('Your sale was updated.');
+}
+
+async function endMySale(id){
+  const s=sales.find(x=>String(x.id)===String(id));
+  const token=mySaleTokens[String(id)];
+  if(!s||!token) return;
+
+  if(!confirm(`End this garage sale now?\n\n${s.address}`)) return;
+
+  const {data,error}=await db.rpc('end_garage_sale',{
+    p_id:String(id),
+    p_token:token
+  });
+
+  if(error){
+    console.error(error);
+    alert('Could not end this sale. Make sure the one-time Supabase setup has been run.');
+    return;
+  }
+
+  if(data!==true){
+    alert('This sale could not be ended from this device.');
+    return;
+  }
+
+  sales=sales.filter(x=>String(x.id)!==String(id));
+  render();
+  alert('Your garage sale has ended.');
 }
 
 const map=L.map('map').setView([39.2461,-94.4191],11);
@@ -388,6 +565,7 @@ async function shareSale(id){
     'Garage Sale',
     s.address,
     'Date: '+formatSaleDate(s.date),
+    s.start_at ? 'Starts: '+formatStart(s.start_at) : '',
     s.ends_at ? 'Ends: '+formatEnd(s.ends_at) : '',
     'Items: '+s.items,
     'Directions: '+directions(s.address)
@@ -407,15 +585,44 @@ async function shareSale(id){
   }
 }
 
-function openPhoto(id){
+function salePhotos(s){
+  if(!s) return [];
+  const list=Array.isArray(s.photo_urls)?s.photo_urls.filter(Boolean):[];
+  if(s.photo_url && !list.includes(s.photo_url)) list.unshift(s.photo_url);
+  return list.slice(0,5);
+}
+
+function openPhoto(id,index=0){
   const s=sales.find(x=>String(x.id)===String(id));
-  if(!s||!s.photo_url) return;
-  const modal=document.getElementById('photoModal');
-  const img=document.getElementById('modalPhoto');
-  img.src=s.photo_url;
-  img.alt='Garage sale photo at '+s.address;
-  modal.classList.add('open');
+  const photos=salePhotos(s);
+  if(!s||!photos.length) return;
+
+  modalSaleId=String(id);
+  modalPhotoIndex=Math.max(0,Math.min(index,photos.length-1));
+  updatePhotoModal();
+
+  document.getElementById('photoModal').classList.add('open');
   document.body.style.overflow='hidden';
+}
+
+function updatePhotoModal(){
+  const s=sales.find(x=>String(x.id)===String(modalSaleId));
+  const photos=salePhotos(s);
+  if(!s||!photos.length) return closePhoto();
+
+  modalPhotoIndex=(modalPhotoIndex+photos.length)%photos.length;
+  const img=document.getElementById('modalPhoto');
+  img.src=photos[modalPhotoIndex];
+  img.alt=`Garage sale photo ${modalPhotoIndex+1} of ${photos.length} at ${s.address}`;
+
+  document.getElementById('photoCounter').textContent=`${modalPhotoIndex+1} of ${photos.length}`;
+  document.getElementById('photoPrev').style.display=photos.length>1?'block':'none';
+  document.getElementById('photoNext').style.display=photos.length>1?'block':'none';
+}
+
+function changePhoto(delta){
+  modalPhotoIndex+=delta;
+  updatePhotoModal();
 }
 
 function closePhoto(){
@@ -423,6 +630,8 @@ function closePhoto(){
   const img=document.getElementById('modalPhoto');
   modal.classList.remove('open');
   img.src='';
+  modalSaleId=null;
+  modalPhotoIndex=0;
   document.body.style.overflow='';
 }
 
@@ -472,6 +681,7 @@ async function shareMyList(){
       return [
         `${index+1}. ${s.address}`,
         `Date: ${formatSaleDate(s.date)}`,
+        s.start_at ? `Starts: ${formatStart(s.start_at)}` : '',
         s.ends_at ? `Ends: ${formatEnd(s.ends_at)}` : '',
         `Items: ${s.items}`,
         note ? `My note: ${note}` : '',
@@ -507,6 +717,7 @@ function printMyList(){
       <div class="print-sale">
         <h2>${index+1}. ${esc(s.address)}</h2>
         <p><b>Date:</b> ${esc(formatSaleDate(s.date))}</p>
+        ${s.start_at ? `<p><b>Starts:</b> ${esc(formatStart(s.start_at))}</p>` : ''}
         ${s.ends_at ? `<p><b>Ends:</b> ${esc(formatEnd(s.ends_at))}</p>` : ''}
         <p><b>Items:</b> ${esc(s.items)}</p>
         ${getPersonalNote(s.id) ? `<p><b>My note:</b> ${esc(getPersonalNote(s.id))}</p>` : ''}
@@ -668,6 +879,11 @@ function isActive(row){
 }
 
 function normalizeSale(row){
+  const photos=Array.isArray(row.photo_urls)
+    ? row.photo_urls.filter(x=>typeof x==='string'&&x.trim())
+    : [];
+  if(row.photo_url && !photos.includes(row.photo_url)) photos.unshift(row.photo_url);
+
   return {
     id: row.id,
     address: row.address || '',
@@ -676,8 +892,10 @@ function normalizeSale(row){
     lat: row.latitude == null ? null : Number(row.latitude),
     lon: row.longitude == null ? null : Number(row.longitude),
     created_at: row.created_at || null,
+    start_at: row.start_at || null,
     ends_at: row.ends_at || null,
-    photo_url: row.photo_url || ''
+    photo_url: row.photo_url || photos[0] || '',
+    photo_urls: photos.slice(0,5)
   };
 }
 
@@ -700,6 +918,14 @@ function badgeMarkup(s){
     }
   }
 
+  if(isOpenNow(s)){
+    badges.push('<span class="sale-badge badge-open">OPEN NOW</span>');
+  }
+
+  if(ownsSale(s.id)){
+    badges.push('<span class="sale-badge badge-my-sale">MY SALE</span>');
+  }
+
   if(isVisited(s.id)){
     badges.push('<span class="sale-badge badge-visited">VISITED</span>');
   }
@@ -715,8 +941,9 @@ function render(){
     .filter(s=>!hideVisited||!isVisited(s.id))
     .filter(matchesDateFilter)
     .filter(categoryMatches)
+    .filter(s=>!openNowOnly||isOpenNow(s))
     .filter(s=>!savedOnly||isFavorite(s.id))
-    .filter(s=>!photosOnly||Boolean(s.photo_url))
+    .filter(s=>!photosOnly||salePhotos(s).length>0)
     .filter(s=>{
       const selected=document.getElementById('distanceFilter').value;
       if(selected==='all'||!userLocation) return true;
@@ -764,13 +991,14 @@ function render(){
       <h3>${esc(s.address)}</h3>
       ${badgeMarkup(s)}
       <p><b>Date:</b> ${esc(formatSaleDate(s.date))}</p>
+      ${s.start_at ? `<p><b>Starts:</b> ${esc(formatStart(s.start_at))}</p>` : ''}
       ${s.ends_at ? `<p><b>Ends:</b> ${esc(formatEnd(s.ends_at))}</p>` : ''}
       <p><b>Items:</b> ${esc(s.items)}</p>
       ${getPersonalNote(s.id) ? `<div class="personal-note"><b>My note:</b> ${esc(getPersonalNote(s.id))}</div>` : ''}
       ${saleDistance(s)!==null ? `<p><b>Distance:</b> ${saleDistance(s).toFixed(1)} miles away</p>` : ''}
-      ${s.photo_url ? `<img class="sale-photo" src="${esc(s.photo_url)}" alt="Garage sale photo" loading="lazy" onclick="openPhoto(${s.id})" title="Tap to enlarge">` : ''}
+      ${salePhotos(s).length ? `<div class="sale-photo-grid">${salePhotos(s).map((url,i)=>`<img class="sale-photo" src="${esc(url)}" alt="Garage sale photo ${i+1}" loading="lazy" onclick="openPhoto(${s.id},${i})" title="Tap to enlarge">`).join('')}</div><div class="sale-photo-count">${salePhotos(s).length} ${salePhotos(s).length===1?'photo':'photos'}</div>` : ''}
       <div class="actions">
-        ${s.photo_url ? `<button class="secondary" onclick="openPhoto(${s.id})">View Larger Photo</button>` : ''}
+        ${salePhotos(s).length ? `<button class="secondary" onclick="openPhoto(${s.id},0)">View Photos (${salePhotos(s).length})</button>` : ''}
         <button class="primary" onclick="window.open('${directions(s.address)}','_blank')">Get Directions</button>
         <button class="secondary" onclick="showSaleOnMap(${s.id})">Show on Map</button>
         <button class="secondary favorite-btn ${isFavorite(s.id)?'active':''}" onclick="toggleFavorite(${s.id})">${isFavorite(s.id)?'★ Saved':'☆ Save Sale'}</button>
@@ -778,6 +1006,7 @@ function render(){
         <button class="secondary note-btn ${getPersonalNote(s.id)?'active':''}" onclick="editPersonalNote(${s.id})">${getPersonalNote(s.id)?'Edit My Note':'Add My Note'}</button>
         <button class="secondary" onclick="shareSale(${s.id})">Share Sale</button>
         <button class="secondary" onclick="copyAddress(${s.id})">Copy Address</button>
+        ${ownsSale(s.id)?`<button class="owner-btn" onclick="editMySale(${s.id})">Edit My Sale</button><button class="end-sale-btn" onclick="endMySale(${s.id})">End My Sale</button>`:''}
         <button class="secondary" onclick="hideSale(${s.id})">Hide From My List</button>
       </div>
     </div>
@@ -786,9 +1015,10 @@ function render(){
   const bounds=[];
   filtered.forEach(s=>{
     if(Number.isFinite(s.lat)&&Number.isFinite(s.lon)){
+      const startLine=s.start_at ? `<br><b>Starts:</b> ${esc(formatStart(s.start_at))}` : '';
       const endLine=s.ends_at ? `<br><b>Ends:</b> ${esc(formatEnd(s.ends_at))}` : '';
       const m=L.marker([s.lat,s.lon]).addTo(map)
-        .bindPopup(`<b>${esc(s.address)}</b><br>${esc(formatSaleDate(s.date))}${endLine}<br>${esc(s.items)}`);
+        .bindPopup(`<b>${esc(s.address)}</b><br>${esc(formatSaleDate(s.date))}${startLine}${endLine}<br>${esc(s.items)}`);
       markers.push(m);
       markerById.set(String(s.id),m);
       bounds.push([s.lat,s.lon]);
@@ -813,7 +1043,7 @@ async function loadSales(showRefreshMessage=false){
 
   const {data,error}=await db
     .from('garage_sales')
-    .select('id,address,date,items,latitude,longitude,created_at,ends_at,photo_url')
+    .select('id,address,date,items,latitude,longitude,created_at,start_at,ends_at,photo_url,photo_urls')
     .order('created_at',{ascending:false});
 
   if(showRefreshMessage) refreshButton.disabled=false;
@@ -851,11 +1081,11 @@ async function uploadPhoto(file){
   if(!file) return '';
 
   if(!file.type || !file.type.startsWith('image/')){
-    throw Error('Please choose an image file.');
+    throw Error('Please choose image files only.');
   }
 
   if(file.size > 10 * 1024 * 1024){
-    throw Error('Photo must be 10 MB or smaller.');
+    throw Error('Each photo must be 10 MB or smaller.');
   }
 
   const ext=(file.name.split('.').pop() || 'jpg').replace(/[^a-zA-Z0-9]/g,'').toLowerCase() || 'jpg';
@@ -871,21 +1101,48 @@ async function uploadPhoto(file){
   return data.publicUrl || '';
 }
 
+async function uploadPhotos(files,status){
+  const list=Array.from(files||[]);
+  if(list.length>5) throw Error('Please choose no more than 5 photos.');
+
+  const urls=[];
+  for(let i=0;i<list.length;i++){
+    status.textContent=`Uploading photo ${i+1} of ${list.length}...`;
+    urls.push(await uploadPhoto(list[i]));
+  }
+  return urls;
+}
+
 async function addSale(e){
   e.preventDefault();
 
   const address=document.getElementById('address').value.trim();
   const date=document.getElementById('date').value.trim();
+  const startTime=document.getElementById('startTime').value;
   const items=document.getElementById('items').value.trim();
   const endsRaw=document.getElementById('ends').value;
-  const photoFile=document.getElementById('photo').files[0] || null;
+  const photoFiles=document.getElementById('photo').files;
   const status=document.getElementById('status');
   const button=e.target.querySelector('button[type="submit"]');
 
+  const startDate=new Date(`${date}T${startTime}`);
   const endsDate=new Date(endsRaw);
-  if(Number.isNaN(endsDate.getTime()) || endsDate.getTime() <= Date.now()){
+
+  if(Number.isNaN(startDate.getTime()) || Number.isNaN(endsDate.getTime()) || endsDate<=startDate){
+    status.classList.add('error');
+    status.textContent='Please choose valid start and ending times. The ending time must be after the start time.';
+    return;
+  }
+
+  if(endsDate.getTime() <= Date.now()){
     status.classList.add('error');
     status.textContent='Please choose an ending time in the future.';
+    return;
+  }
+
+  if(photoFiles.length>5){
+    status.classList.add('error');
+    status.textContent='Please choose no more than 5 photos.';
     return;
   }
 
@@ -900,21 +1157,33 @@ async function addSale(e){
     console.warn(err);
   }
 
-  let photoUrl='';
-  if(photoFile){
-    status.textContent='Uploading photo...';
+  let photoUrls=[];
+  if(photoFiles.length){
     try{
-      photoUrl=await uploadPhoto(photoFile);
+      photoUrls=await uploadPhotos(photoFiles,status);
     }catch(err){
       console.error(err);
       button.disabled=false;
       status.classList.add('error');
-      status.textContent=err?.message || 'Could not upload the photo. Please try again.';
+      status.textContent=err?.message || 'Could not upload the photos. Please try again.';
       return;
     }
   }
 
   status.textContent='Saving garage sale...';
+
+  let editToken='';
+  let editTokenHash='';
+  try{
+    editToken=randomToken();
+    editTokenHash=await sha256Hex(editToken);
+  }catch(err){
+    console.error(err);
+    button.disabled=false;
+    status.classList.add('error');
+    status.textContent='Could not create the private editing key in this browser.';
+    return;
+  }
 
   const {data,error}=await db
     .from('garage_sales')
@@ -924,10 +1193,13 @@ async function addSale(e){
       items,
       latitude:loc.lat,
       longitude:loc.lon,
+      start_at:startDate.toISOString(),
       ends_at:endsDate.toISOString(),
-      photo_url:photoUrl
+      photo_url:photoUrls[0]||'',
+      photo_urls:photoUrls,
+      edit_token_hash:editTokenHash
     })
-    .select('id,address,date,items,latitude,longitude,created_at,ends_at,photo_url')
+    .select('id,address,date,items,latitude,longitude,created_at,start_at,ends_at,photo_url,photo_urls')
     .single();
 
   button.disabled=false;
@@ -935,17 +1207,20 @@ async function addSale(e){
   if(error){
     console.error(error);
     status.classList.add('error');
-    status.textContent='Could not post the garage sale. Please try again.';
+    status.textContent='Could not post the garage sale. Run the one-time Supabase setup for the new features, then try again.';
     return;
   }
+
+  mySaleTokens[String(data.id)]=editToken;
+  saveMySaleTokens();
 
   sales.unshift(normalizeSale(data));
   e.target.reset();
   render();
 
   status.textContent=Number.isFinite(loc.lat)&&Number.isFinite(loc.lon)
-    ? 'Garage sale posted. It will automatically disappear after the ending time.'
-    : 'Garage sale posted. It will expire automatically, but the address could not be placed on the map.';
+    ? 'Garage sale posted. You can edit it or end it early from this browser.'
+    : 'Garage sale posted. You can edit it or end it early from this browser, but the address could not be placed on the map.';
 }
 
 function hideSale(id){
@@ -995,11 +1270,13 @@ document.getElementById('clearFiltersBtn').addEventListener('click',()=>{
   document.getElementById('search').value='';
   dateFilter='all';
   categoryFilter='all';
+  openNowOnly=false;
   savedOnly=false;
   photosOnly=false;
   hideVisited=false;
   document.getElementById('distanceFilter').value='all';
   document.getElementById('sortChoice').value='newest';
+  document.getElementById('openNowBtn').classList.remove('active');
   document.getElementById('savedOnlyBtn').classList.remove('active');
   document.getElementById('photosOnlyBtn').classList.remove('active');
   document.getElementById('hideVisitedBtn').classList.remove('active');
@@ -1009,10 +1286,19 @@ document.getElementById('clearFiltersBtn').addEventListener('click',()=>{
 });
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape') closePhoto();
+  if(document.getElementById('photoModal').classList.contains('open')){
+    if(e.key==='ArrowLeft') changePhoto(-1);
+    if(e.key==='ArrowRight') changePhoto(1);
+  }
 });
 document.getElementById('photosOnlyBtn').addEventListener('click',()=>{
   photosOnly=!photosOnly;
   document.getElementById('photosOnlyBtn').classList.toggle('active',photosOnly);
+  render();
+});
+document.getElementById('openNowBtn').addEventListener('click',()=>{
+  openNowOnly=!openNowOnly;
+  document.getElementById('openNowBtn').classList.toggle('active',openNowOnly);
   render();
 });
 document.getElementById('savedOnlyBtn').addEventListener('click',()=>{
