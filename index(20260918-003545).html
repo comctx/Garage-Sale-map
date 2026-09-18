@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Garage Sale Map</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f3f4f6;color:#1f2937}header{background:#2563eb;color:#fff;padding:18px 20px}header h1{margin:0 0 4px}.wrap{width:min(1050px,calc(100% - 24px));margin:18px auto 40px;display:grid;gap:18px}.card{background:#fff;border-radius:14px;padding:18px;box-shadow:0 4px 16px rgba(0,0,0,.08)}#map{height:420px;border-radius:12px;margin-top:12px}input,textarea,button{font:inherit}input,textarea{width:100%;padding:11px;border:1px solid #cbd5e1;border-radius:9px;box-sizing:border-box;margin-top:6px}textarea{min-height:90px}button{border:0;border-radius:9px;padding:11px 14px;font-weight:700;cursor:pointer}.primary{background:#2563eb;color:#fff}.secondary{background:#e5e7eb}.danger{background:#fee2e2;color:#991b1b}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.sale{border:1px solid #e5e7eb;border-radius:12px;padding:14px;margin-top:12px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.muted{color:#64748b;font-size:14px}@media(max-width:700px){.grid{grid-template-columns:1fr}#map{height:340px}}
+</style>
+</head>
+<body>
+<header><h1>Garage Sale Map</h1><div>Find nearby garage sales or post your own.</div></header>
+<div class="wrap">
+<section class="card"><input id="search" placeholder="Search by address, items, or date..."><div id="map"></div></section>
+<section class="card"><h2>Garage Sales</h2><div id="list"></div></section>
+<section class="card"><h2>Post a Garage Sale</h2><p class="muted">Sales are saved on this browser.</p><form id="form"><div class="grid"><label>Address<input id="address" required placeholder="123 Main St, City, State"></label><label>Date<input id="date" required placeholder="Saturday, Sept. 20"></label></div><label>Items<textarea id="items" required placeholder="Furniture, tools, clothes, toys..."></textarea></label><button class="primary" type="submit">Post Garage Sale</button></form><p id="status" class="muted"></p></section>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const KEY='garage-sale-map-v1';
+let sales=[];try{sales=JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){}
+if(!Array.isArray(sales))sales=[];
+const map=L.map('map').setView([39.2461,-94.4191],11);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap contributors'}).addTo(map);
+let markers=[];
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function save(){localStorage.setItem(KEY,JSON.stringify(sales))}
+function directions(a){return 'https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent(a)}
+function render(){const q=document.getElementById('search').value.trim().toLowerCase();const filtered=sales.filter(s=>[s.address,s.date,s.items].join(' ').toLowerCase().includes(q));markers.forEach(m=>map.removeLayer(m));markers=[];const list=document.getElementById('list');if(!filtered.length){list.innerHTML='<p class="muted">No garage sales yet.</p>';return}list.innerHTML=filtered.map(s=>`<div class="sale"><h3>${esc(s.address)}</h3><p><b>Date:</b> ${esc(s.date)}</p><p><b>Items:</b> ${esc(s.items)}</p><div class="actions"><button class="primary" onclick="window.open('${directions(s.address)}','_blank')">Get Directions</button><button class="danger" onclick="removeSale('${s.id}')">Delete</button></div></div>`).join('');const bounds=[];filtered.forEach(s=>{if(Number.isFinite(s.lat)&&Number.isFinite(s.lon)){const m=L.marker([s.lat,s.lon]).addTo(map).bindPopup(`<b>${esc(s.address)}</b><br>${esc(s.date)}<br>${esc(s.items)}`);markers.push(m);bounds.push([s.lat,s.lon])}});if(bounds.length===1)map.setView(bounds[0],13);if(bounds.length>1)map.fitBounds(bounds,{padding:[25,25]})}
+async function geocode(a){const r=await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q='+encodeURIComponent(a));const j=await r.json();if(!j.length)throw Error();return{lat:Number(j[0].lat),lon:Number(j[0].lon)}}
+async function addSale(e){e.preventDefault();const address=document.getElementById('address').value.trim(),date=document.getElementById('date').value.trim(),items=document.getElementById('items').value.trim(),status=document.getElementById('status');status.textContent='Finding address on map...';let loc={lat:null,lon:null};try{loc=await geocode(address);status.textContent='Garage sale posted.'}catch(err){status.textContent='Sale posted. Address could not be placed on the map, but Get Directions will still work.'}sales.unshift({id:String(Date.now()),address,date,items,...loc});save();e.target.reset();render()}
+function removeSale(id){sales=sales.filter(s=>s.id!==id);save();render()}
+document.getElementById('form').addEventListener('submit',addSale);document.getElementById('search').addEventListener('input',render);render();
+</script>
+</body>
+</html>
