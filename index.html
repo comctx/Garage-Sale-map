@@ -22,7 +22,7 @@ button{border:0;border-radius:9px;padding:11px 14px;font-weight:700;cursor:point
 .sale{border:1px solid #e5e7eb;border-radius:12px;padding:14px;margin-top:12px}
 .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .muted{color:#64748b;font-size:14px}
-.error{color:#991b1b}.sale-photo{width:100%;max-width:420px;max-height:300px;object-fit:cover;border-radius:10px;margin:8px 0 12px;display:block;cursor:pointer}.results-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.result-count{font-weight:700;color:#475569}.photo-modal{position:fixed;inset:0;background:rgba(0,0,0,.82);display:none;align-items:center;justify-content:center;padding:20px;z-index:9999}.photo-modal.open{display:flex}.photo-modal-inner{position:relative;max-width:min(900px,95vw);max-height:90vh}.photo-modal img{display:block;max-width:100%;max-height:85vh;border-radius:12px;background:#fff}.photo-modal-close{position:absolute;right:-10px;top:-12px;width:44px;height:44px;border-radius:50%;background:#fff;color:#111827;font-size:26px;line-height:1;padding:0;box-shadow:0 3px 12px rgba(0,0,0,.35)}.photo-section{margin-top:16px;padding:16px;border:2px solid #2563eb;border-radius:12px;background:#eff6ff}.photo-title{font-size:20px;font-weight:800;color:#1d4ed8;margin-bottom:6px;display:block}.photo-note{display:block;font-size:14px;color:#475569;margin:6px 0 0}.empty-state{padding:22px;border:2px solid #cbd5e1;border-radius:12px;background:#f8fafc;text-align:center;font-size:22px;font-weight:700;color:#334155;margin-top:12px}.empty-state small{display:block;font-size:14px;font-weight:400;color:#64748b;margin-top:6px}
+.error{color:#991b1b}.sale-photo{width:100%;max-width:420px;max-height:300px;object-fit:cover;border-radius:10px;margin:8px 0 12px;display:block;cursor:pointer}.results-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.result-count{font-weight:700;color:#475569}.badge-row{display:flex;gap:7px;flex-wrap:wrap;margin:4px 0 8px}.sale-badge{display:inline-block;padding:5px 8px;border-radius:999px;font-size:12px;font-weight:800}.badge-new{background:#dcfce7;color:#166534}.badge-ending{background:#fee2e2;color:#991b1b}.refresh-status{align-self:center}.compact-btn.active{background:#2563eb;color:#fff}#list.compact-view .sale{padding:10px;margin-top:8px}#list.compact-view .sale h3{margin:2px 0 6px}#list.compact-view .sale p{margin:4px 0}#list.compact-view .sale-photo{max-width:220px;max-height:145px;margin:6px 0 8px}#list.compact-view .actions{gap:6px;margin-top:7px}#list.compact-view .actions button{padding:8px 10px;font-size:14px}.photo-modal{position:fixed;inset:0;background:rgba(0,0,0,.82);display:none;align-items:center;justify-content:center;padding:20px;z-index:9999}.photo-modal.open{display:flex}.photo-modal-inner{position:relative;max-width:min(900px,95vw);max-height:90vh}.photo-modal img{display:block;max-width:100%;max-height:85vh;border-radius:12px;background:#fff}.photo-modal-close{position:absolute;right:-10px;top:-12px;width:44px;height:44px;border-radius:50%;background:#fff;color:#111827;font-size:26px;line-height:1;padding:0;box-shadow:0 3px 12px rgba(0,0,0,.35)}.photo-section{margin-top:16px;padding:16px;border:2px solid #2563eb;border-radius:12px;background:#eff6ff}.photo-title{font-size:20px;font-weight:800;color:#1d4ed8;margin-bottom:6px;display:block}.photo-note{display:block;font-size:14px;color:#475569;margin:6px 0 0}.empty-state{padding:22px;border:2px solid #cbd5e1;border-radius:12px;background:#f8fafc;text-align:center;font-size:22px;font-weight:700;color:#334155;margin-top:12px}.empty-state small{display:block;font-size:14px;font-weight:400;color:#64748b;margin-top:6px}
 @media(max-width:700px){.grid{grid-template-columns:1fr}#map{height:340px}}
 </style>
 </head>
@@ -70,7 +70,12 @@ button{border:0;border-radius:9px;padding:11px 14px;font-weight:700;cursor:point
       <h2>Garage Sales</h2>
       <span id="resultCount" class="result-count">0 sales</span>
     </div>
-    <div class="actions"><button id="restoreHidden" class="secondary" type="button" style="display:none">Show Hidden Sales Again</button></div>
+    <div class="actions">
+      <button id="refreshBtn" class="secondary" type="button">↻ Refresh Listings</button>
+      <button id="compactViewBtn" class="secondary compact-btn" type="button">Compact View</button>
+      <button id="restoreHidden" class="secondary" type="button" style="display:none">Show Hidden Sales Again</button>
+      <span id="refreshStatus" class="muted refresh-status"></span>
+    </div>
     <div id="list"><p class="muted">Loading garage sales...</p></div>
   </section>
 
@@ -123,6 +128,7 @@ let sales=[];
 let dateFilter='all';
 let savedOnly=false;
 let photosOnly=false;
+let compactView=false;
 let userLocation=null;
 const HIDDEN_KEY='garage_sale_hidden_ids_v1';
 const FAVORITES_KEY='garage_sale_favorite_ids_v1';
@@ -406,6 +412,28 @@ function normalizeSale(row){
   };
 }
 
+function badgeMarkup(s){
+  const badges=[];
+  const now=Date.now();
+
+  if(s.created_at){
+    const created=new Date(s.created_at).getTime();
+    if(Number.isFinite(created) && now-created <= 24*60*60*1000){
+      badges.push('<span class="sale-badge badge-new">NEW</span>');
+    }
+  }
+
+  if(s.ends_at){
+    const end=new Date(s.ends_at).getTime();
+    const remaining=end-now;
+    if(Number.isFinite(end) && remaining>0 && remaining <= 2*60*60*1000){
+      badges.push('<span class="sale-badge badge-ending">ENDING SOON</span>');
+    }
+  }
+
+  return badges.length ? '<div class="badge-row">'+badges.join('')+'</div>' : '';
+}
+
 function render(){
   const q=document.getElementById('search').value.trim().toLowerCase();
   let filtered=sales
@@ -442,6 +470,7 @@ function render(){
   markers=[];
 
   const list=document.getElementById('list');
+  list.classList.toggle('compact-view',compactView);
   const resultCount=document.getElementById('resultCount');
   resultCount.textContent=filtered.length+' '+(filtered.length===1?'sale':'sales');
   const restoreButton=document.getElementById('restoreHidden');
@@ -455,6 +484,7 @@ function render(){
   list.innerHTML=filtered.map(s=>`
     <div class="sale">
       <h3>${esc(s.address)}</h3>
+      ${badgeMarkup(s)}
       <p><b>Date:</b> ${esc(formatSaleDate(s.date))}</p>
       ${s.ends_at ? `<p><b>Ends:</b> ${esc(formatEnd(s.ends_at))}</p>` : ''}
       <p><b>Items:</b> ${esc(s.items)}</p>
@@ -486,21 +516,39 @@ function render(){
   if(bounds.length>1) map.fitBounds(bounds,{padding:[25,25]});
 }
 
-async function loadSales(){
+async function loadSales(showRefreshMessage=false){
   const list=document.getElementById('list');
+  const refreshButton=document.getElementById('refreshBtn');
+  const refreshStatus=document.getElementById('refreshStatus');
+
+  if(showRefreshMessage){
+    refreshButton.disabled=true;
+    refreshStatus.textContent='Refreshing...';
+  }
+
   const {data,error}=await db
     .from('garage_sales')
     .select('id,address,date,items,latitude,longitude,created_at,ends_at,photo_url')
     .order('created_at',{ascending:false});
 
+  if(showRefreshMessage) refreshButton.disabled=false;
+
   if(error){
     console.error(error);
+    if(showRefreshMessage) refreshStatus.textContent='Could not refresh.';
     list.innerHTML='<p class="muted error">Could not load garage sales. Please refresh and try again.</p>';
     return;
   }
 
   sales=(data||[]).map(normalizeSale);
   render();
+
+  if(showRefreshMessage){
+    refreshStatus.textContent='Updated just now.';
+    setTimeout(()=>{
+      if(refreshStatus.textContent==='Updated just now.') refreshStatus.textContent='';
+    },4000);
+  }
 }
 
 async function geocode(address){
@@ -645,6 +693,14 @@ document.getElementById('search').addEventListener('keydown',e=>{
   }
 });
 document.getElementById('restoreHidden').addEventListener('click',restoreHiddenSales);
+document.getElementById('refreshBtn').addEventListener('click',()=>loadSales(true));
+document.getElementById('compactViewBtn').addEventListener('click',()=>{
+  compactView=!compactView;
+  const button=document.getElementById('compactViewBtn');
+  button.classList.toggle('active',compactView);
+  button.textContent=compactView?'Regular View':'Compact View';
+  render();
+});
 document.getElementById('useLocationBtn').addEventListener('click',requestLocation);
 document.getElementById('distanceFilter').addEventListener('change',render);
 document.getElementById('sortChoice').addEventListener('change',render);
