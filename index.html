@@ -18,7 +18,7 @@ textarea{min-height:90px}
 button{border:0;border-radius:9px;padding:11px 14px;font-weight:700;cursor:pointer}
 .primary{background:#2563eb;color:#fff}
 .danger{background:#fee2e2;color:#991b1b}.secondary{background:#e5e7eb;color:#1f2937}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.search-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end}.search-row button{min-width:110px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.search-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end}.search-row button{min-width:110px}.filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.filter-btn{background:#e5e7eb;color:#1f2937}.filter-btn.active{background:#2563eb;color:#fff}
 .sale{border:1px solid #e5e7eb;border-radius:12px;padding:14px;margin-top:12px}
 .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .muted{color:#64748b;font-size:14px}
@@ -34,6 +34,12 @@ button{border:0;border-radius:9px;padding:11px 14px;font-weight:700;cursor:point
     <div class="search-row">
       <input id="search" placeholder="Search by address, item, or ZIP code...">
       <button id="searchBtn" class="primary" type="button">Search</button>
+    </div>
+    <div class="filter-row" aria-label="Date filters">
+      <button class="filter-btn active" type="button" data-filter="all">All Sales</button>
+      <button class="filter-btn" type="button" data-filter="today">Today</button>
+      <button class="filter-btn" type="button" data-filter="tomorrow">Tomorrow</button>
+      <button class="filter-btn" type="button" data-filter="weekend">This Weekend</button>
     </div>
     <div id="map"></div>
   </section>
@@ -53,7 +59,7 @@ button{border:0;border-radius:9px;padding:11px 14px;font-weight:700;cursor:point
           <input id="address" required placeholder="123 Main St, City, State ZIP">
         </label>
         <label>Sale Date
-          <input id="date" required placeholder="Saturday, Sept. 20">
+          <input id="date" type="date" required>
         </label>
       </div>
       <div class="grid">
@@ -83,6 +89,7 @@ const SUPABASE_KEY='sb_publishable_DaHk2sr-fSYJBCBt8vOesw_HDRrbPBF';
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
 let sales=[];
+let dateFilter='all';
 const HIDDEN_KEY='garage_sale_hidden_ids_v1';
 let hiddenIds=[];
 try{
@@ -125,6 +132,87 @@ function formatEnd(iso){
   return d.toLocaleString();
 }
 
+
+function localDayStart(d){
+  return new Date(d.getFullYear(),d.getMonth(),d.getDate());
+}
+
+function parseSaleDate(value,endsAt){
+  const raw=String(value||'').trim();
+
+  if(/^\d{4}-\d{2}-\d{2}$/.test(raw)){
+    const [y,m,d]=raw.split('-').map(Number);
+    return new Date(y,m-1,d);
+  }
+
+  if(raw){
+    const parsed=new Date(raw);
+    if(!Number.isNaN(parsed.getTime())) return localDayStart(parsed);
+  }
+
+  if(endsAt){
+    const end=new Date(endsAt);
+    if(!Number.isNaN(end.getTime())) return localDayStart(end);
+  }
+
+  return null;
+}
+
+function formatSaleDate(value){
+  const d=parseSaleDate(value,null);
+  if(!d) return value || '';
+  return d.toLocaleDateString([],{
+    weekday:'short',
+    month:'short',
+    day:'numeric',
+    year:'numeric'
+  });
+}
+
+function sameDay(a,b){
+  return a&&b&&
+    a.getFullYear()===b.getFullYear()&&
+    a.getMonth()===b.getMonth()&&
+    a.getDate()===b.getDate();
+}
+
+function weekendRange(now){
+  const today=localDayStart(now);
+  const day=today.getDay();
+  let daysToSaturday=(6-day+7)%7;
+  if(day===0) daysToSaturday=-1;
+
+  const saturday=new Date(today);
+  saturday.setDate(today.getDate()+daysToSaturday);
+  const sunday=new Date(saturday);
+  sunday.setDate(saturday.getDate()+1);
+  return {saturday,sunday};
+}
+
+function matchesDateFilter(s){
+  if(dateFilter==='all') return true;
+
+  const saleDate=parseSaleDate(s.date,s.ends_at);
+  if(!saleDate) return false;
+
+  const today=localDayStart(new Date());
+
+  if(dateFilter==='today') return sameDay(saleDate,today);
+
+  if(dateFilter==='tomorrow'){
+    const tomorrow=new Date(today);
+    tomorrow.setDate(today.getDate()+1);
+    return sameDay(saleDate,tomorrow);
+  }
+
+  if(dateFilter==='weekend'){
+    const {saturday,sunday}=weekendRange(today);
+    return sameDay(saleDate,saturday)||sameDay(saleDate,sunday);
+  }
+
+  return true;
+}
+
 function isActive(row){
   const now=Date.now();
 
@@ -160,6 +248,7 @@ function render(){
   const filtered=sales
     .filter(isActive)
     .filter(s=>!isHidden(s.id))
+    .filter(matchesDateFilter)
     .filter(s=>[s.address,s.date,s.items].join(' ').toLowerCase().includes(q));
 
   markers.forEach(m=>map.removeLayer(m));
@@ -177,7 +266,7 @@ function render(){
   list.innerHTML=filtered.map(s=>`
     <div class="sale">
       <h3>${esc(s.address)}</h3>
-      <p><b>Date:</b> ${esc(s.date)}</p>
+      <p><b>Date:</b> ${esc(formatSaleDate(s.date))}</p>
       ${s.ends_at ? `<p><b>Ends:</b> ${esc(formatEnd(s.ends_at))}</p>` : ''}
       <p><b>Items:</b> ${esc(s.items)}</p>
       ${s.photo_url ? `<img class="sale-photo" src="${esc(s.photo_url)}" alt="Garage sale photo" loading="lazy">` : ''}
@@ -193,7 +282,7 @@ function render(){
     if(Number.isFinite(s.lat)&&Number.isFinite(s.lon)){
       const endLine=s.ends_at ? `<br><b>Ends:</b> ${esc(formatEnd(s.ends_at))}` : '';
       const m=L.marker([s.lat,s.lon]).addTo(map)
-        .bindPopup(`<b>${esc(s.address)}</b><br>${esc(s.date)}${endLine}<br>${esc(s.items)}`);
+        .bindPopup(`<b>${esc(s.address)}</b><br>${esc(formatSaleDate(s.date))}${endLine}<br>${esc(s.items)}`);
       markers.push(m);
       bounds.push([s.lat,s.lon]);
     }
@@ -362,6 +451,13 @@ document.getElementById('search').addEventListener('keydown',e=>{
   }
 });
 document.getElementById('restoreHidden').addEventListener('click',restoreHiddenSales);
+document.querySelectorAll('.filter-btn').forEach(button=>{
+  button.addEventListener('click',()=>{
+    dateFilter=button.dataset.filter||'all';
+    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b===button));
+    render();
+  });
+});
 setInterval(render,60000);
 loadSales();
 </script>
