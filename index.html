@@ -18,7 +18,7 @@ textarea{min-height:90px}
 button{border:0;border-radius:9px;padding:11px 14px;font-weight:700;cursor:pointer}
 .primary{background:#2563eb;color:#fff}
 .danger{background:#fee2e2;color:#991b1b}.secondary{background:#e5e7eb;color:#1f2937}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.search-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end}.search-row button{min-width:110px}
 .sale{border:1px solid #e5e7eb;border-radius:12px;padding:14px;margin-top:12px}
 .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .muted{color:#64748b;font-size:14px}
@@ -31,7 +31,10 @@ button{border:0;border-radius:9px;padding:11px 14px;font-weight:700;cursor:point
 
 <div class="wrap">
   <section class="card">
-    <input id="search" placeholder="Search by address, item, or ZIP code...">
+    <div class="search-row">
+      <input id="search" placeholder="Search by address, item, or ZIP code...">
+      <button id="searchBtn" class="primary" type="button">Search</button>
+    </div>
     <div id="map"></div>
   </section>
 
@@ -304,6 +307,13 @@ function restoreHiddenSales(){
 
 document.getElementById('form').addEventListener('submit',addSale);
 document.getElementById('search').addEventListener('input',render);
+document.getElementById('searchBtn').addEventListener('click',render);
+document.getElementById('search').addEventListener('keydown',e=>{
+  if(e.key==='Enter'){
+    e.preventDefault();
+    render();
+  }
+});
 document.getElementById('restoreHidden').addEventListener('click',restoreHiddenSales);
 setInterval(render,60000);
 loadSales();
