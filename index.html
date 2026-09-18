@@ -43,6 +43,14 @@ button{border:0;border-radius:9px;padding:11px 14px;font-weight:700;cursor:point
       <button id="savedOnlyBtn" class="filter-btn" type="button">★ Saved Sales</button>
       <button id="hideVisitedBtn" class="filter-btn hide-visited-btn" type="button">Hide Visited</button>
     </div>
+    <div class="filter-row" aria-label="Item category filters">
+      <span class="distance-label">Quick Items</span>
+      <button class="filter-btn category-btn active" type="button" data-category="all">All Items</button>
+      <button class="filter-btn category-btn" type="button" data-category="tools">Tools</button>
+      <button class="filter-btn category-btn" type="button" data-category="furniture">Furniture</button>
+      <button class="filter-btn category-btn" type="button" data-category="clothes">Clothes</button>
+      <button class="filter-btn category-btn" type="button" data-category="toys">Toys & Games</button>
+    </div>
     <div class="filter-row" aria-label="Distance filter">
       <button id="useLocationBtn" class="secondary" type="button">📍 Use My Location</button>
       <span class="distance-label">Show within</span>
@@ -63,10 +71,16 @@ button{border:0;border-radius:9px;padding:11px 14px;font-weight:700;cursor:point
       </select>
       <button id="clearFiltersBtn" class="secondary" type="button">Clear Filters</button>
     </div>
+    <div class="filter-row" aria-label="View mode">
+      <span class="distance-label">View</span>
+      <button class="filter-btn view-mode-btn active" type="button" data-view="both">Map + List</button>
+      <button class="filter-btn view-mode-btn" type="button" data-view="map">Map Only</button>
+      <button class="filter-btn view-mode-btn" type="button" data-view="list">List Only</button>
+    </div>
     <div id="map"></div>
   </section>
 
-  <section class="card">
+  <section id="resultsCard" class="card">
     <div class="results-head">
       <h2>Garage Sales</h2>
       <span id="resultCount" class="result-count">0 sales</span>
@@ -129,16 +143,19 @@ const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
 let sales=[];
 let dateFilter='all';
+let categoryFilter='all';
 let savedOnly=false;
 let photosOnly=false;
 let hideVisited=false;
 let compactView=false;
+let viewMode='both';
 let userLocation=null;
 let lastRenderedSales=[];
 const HIDDEN_KEY='garage_sale_hidden_ids_v1';
 const FAVORITES_KEY='garage_sale_favorite_ids_v1';
 const VISITED_KEY='garage_sale_visited_ids_v1';
 const NOTES_KEY='garage_sale_personal_notes_v1';
+const UI_SETTINGS_KEY='garage_sale_ui_settings_v1';
 let hiddenIds=[];
 let favoriteIds=[];
 let visitedIds=[];
@@ -241,6 +258,92 @@ function editPersonalNote(id){
 
   savePersonalNotes();
   render();
+}
+
+function categoryMatches(s){
+  if(categoryFilter==='all') return true;
+
+  const itemText=String(s.items||'').toLowerCase();
+  const words={
+    tools:['tool','tools','wrench','saw','drill','hammer','socket','mechanic','power tool'],
+    furniture:['furniture','table','chair','couch','sofa','dresser','desk','cabinet','bed','shelf'],
+    clothes:['clothes','clothing','shirt','pants','jeans','dress','shoe','shoes','coat','jacket','apparel'],
+    toys:['toy','toys','game','games','lego','doll','puzzle','bike','bicycle','kids']
+  };
+
+  return (words[categoryFilter]||[]).some(word=>itemText.includes(word));
+}
+
+function saveUiSettings(){
+  try{
+    const settings={
+      search:document.getElementById('search')?.value||'',
+      dateFilter,
+      categoryFilter,
+      savedOnly,
+      photosOnly,
+      hideVisited,
+      compactView,
+      viewMode,
+      sortChoice:document.getElementById('sortChoice')?.value||'newest'
+    };
+    localStorage.setItem(UI_SETTINGS_KEY,JSON.stringify(settings));
+  }catch(e){}
+}
+
+function applyViewMode(){
+  const mapEl=document.getElementById('map');
+  const resultsCard=document.getElementById('resultsCard');
+
+  mapEl.style.display=viewMode==='list'?'none':'block';
+  resultsCard.style.display=viewMode==='map'?'none':'block';
+
+  document.querySelectorAll('.view-mode-btn').forEach(button=>{
+    button.classList.toggle('active',button.dataset.view===viewMode);
+  });
+
+  if(viewMode!=='list'){
+    setTimeout(()=>map.invalidateSize(),50);
+  }
+}
+
+function restoreUiSettings(){
+  try{
+    const saved=JSON.parse(localStorage.getItem(UI_SETTINGS_KEY)||'{}');
+    if(!saved || typeof saved!=='object') return;
+
+    if(typeof saved.search==='string') document.getElementById('search').value=saved.search;
+    if(['all','today','tomorrow','weekend'].includes(saved.dateFilter)) dateFilter=saved.dateFilter;
+    if(['all','tools','furniture','clothes','toys'].includes(saved.categoryFilter)) categoryFilter=saved.categoryFilter;
+
+    savedOnly=saved.savedOnly===true;
+    photosOnly=saved.photosOnly===true;
+    hideVisited=saved.hideVisited===true;
+    compactView=saved.compactView===true;
+
+    if(['both','map','list'].includes(saved.viewMode)) viewMode=saved.viewMode;
+    if(['newest','nearest','ending'].includes(saved.sortChoice)){
+      document.getElementById('sortChoice').value=saved.sortChoice;
+    }
+
+    document.getElementById('savedOnlyBtn').classList.toggle('active',savedOnly);
+    document.getElementById('photosOnlyBtn').classList.toggle('active',photosOnly);
+    document.getElementById('hideVisitedBtn').classList.toggle('active',hideVisited);
+
+    document.querySelectorAll('.filter-btn[data-filter]').forEach(button=>{
+      button.classList.toggle('active',button.dataset.filter===dateFilter);
+    });
+
+    document.querySelectorAll('.category-btn').forEach(button=>{
+      button.classList.toggle('active',button.dataset.category===categoryFilter);
+    });
+
+    const compactButton=document.getElementById('compactViewBtn');
+    compactButton.classList.toggle('active',compactView);
+    compactButton.textContent=compactView?'Regular View':'Compact View';
+
+    applyViewMode();
+  }catch(e){}
 }
 
 const map=L.map('map').setView([39.2461,-94.4191],11);
@@ -611,6 +714,7 @@ function render(){
     .filter(s=>!isHidden(s.id))
     .filter(s=>!hideVisited||!isVisited(s.id))
     .filter(matchesDateFilter)
+    .filter(categoryMatches)
     .filter(s=>!savedOnly||isFavorite(s.id))
     .filter(s=>!photosOnly||Boolean(s.photo_url))
     .filter(s=>{
@@ -693,6 +797,8 @@ function render(){
 
   if(bounds.length===1) map.setView(bounds[0],13);
   if(bounds.length>1) map.fitBounds(bounds,{padding:[25,25]});
+
+  saveUiSettings();
 }
 
 async function loadSales(showRefreshMessage=false){
@@ -888,6 +994,7 @@ document.getElementById('sortChoice').addEventListener('change',render);
 document.getElementById('clearFiltersBtn').addEventListener('click',()=>{
   document.getElementById('search').value='';
   dateFilter='all';
+  categoryFilter='all';
   savedOnly=false;
   photosOnly=false;
   hideVisited=false;
@@ -897,6 +1004,7 @@ document.getElementById('clearFiltersBtn').addEventListener('click',()=>{
   document.getElementById('photosOnlyBtn').classList.remove('active');
   document.getElementById('hideVisitedBtn').classList.remove('active');
   document.querySelectorAll('.filter-btn[data-filter]').forEach(b=>b.classList.toggle('active',b.dataset.filter==='all'));
+  document.querySelectorAll('.category-btn').forEach(b=>b.classList.toggle('active',b.dataset.category==='all'));
   render();
 });
 document.addEventListener('keydown',e=>{
@@ -924,6 +1032,24 @@ document.querySelectorAll('.filter-btn[data-filter]').forEach(button=>{
     render();
   });
 });
+
+document.querySelectorAll('.category-btn').forEach(button=>{
+  button.addEventListener('click',()=>{
+    categoryFilter=button.dataset.category||'all';
+    document.querySelectorAll('.category-btn').forEach(b=>b.classList.toggle('active',b===button));
+    render();
+  });
+});
+
+document.querySelectorAll('.view-mode-btn').forEach(button=>{
+  button.addEventListener('click',()=>{
+    viewMode=button.dataset.view||'both';
+    applyViewMode();
+    saveUiSettings();
+  });
+});
+
+restoreUiSettings();
 setInterval(render,60000);
 loadSales();
 </script>
