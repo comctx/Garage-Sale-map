@@ -173,6 +173,7 @@ let personalNotes={};
 let mySaleTokens={};
 let modalSaleId=null;
 let modalPhotoIndex=0;
+
 try{
   hiddenIds=JSON.parse(localStorage.getItem(HIDDEN_KEY)||'[]');
   if(!Array.isArray(hiddenIds)) hiddenIds=[];
@@ -781,7 +782,6 @@ function formatEnd(iso){
   return d.toLocaleString();
 }
 
-
 function localDayStart(d){
   return new Date(d.getFullYear(),d.getMonth(),d.getDate());
 }
@@ -953,6 +953,7 @@ function render(){
     .filter(s=>[s.address,s.date,s.items].join(' ').toLowerCase().includes(q));
 
   const sortChoice=document.getElementById('sortChoice').value;
+
   if(sortChoice==='nearest'&&userLocation){
     filtered.sort((a,b)=>{
       const da=saleDistance(a);
@@ -976,8 +977,10 @@ function render(){
 
   const list=document.getElementById('list');
   list.classList.toggle('compact-view',compactView);
+
   const resultCount=document.getElementById('resultCount');
   resultCount.textContent=filtered.length+' '+(filtered.length===1?'sale':'sales');
+
   const restoreButton=document.getElementById('restoreHidden');
   restoreButton.style.display=hiddenIds.length ? 'inline-block' : 'none';
 
@@ -1013,12 +1016,15 @@ function render(){
   `).join('');
 
   const bounds=[];
+
   filtered.forEach(s=>{
     if(Number.isFinite(s.lat)&&Number.isFinite(s.lon)){
       const startLine=s.start_at ? `<br><b>Starts:</b> ${esc(formatStart(s.start_at))}` : '';
       const endLine=s.ends_at ? `<br><b>Ends:</b> ${esc(formatEnd(s.ends_at))}` : '';
+
       const m=L.marker([s.lat,s.lon]).addTo(map)
         .bindPopup(`<b>${esc(s.address)}</b><br>${esc(formatSaleDate(s.date))}${startLine}${endLine}<br>${esc(s.items)}`);
+
       markers.push(m);
       markerById.set(String(s.id),m);
       bounds.push([s.lat,s.lon]);
@@ -1060,6 +1066,7 @@ async function loadSales(showRefreshMessage=false){
 
   if(showRefreshMessage){
     refreshStatus.textContent='Updated just now.';
+
     setTimeout(()=>{
       if(refreshStatus.textContent==='Updated just now.') refreshStatus.textContent='';
     },4000);
@@ -1071,10 +1078,17 @@ async function geocode(address){
     'https://nominatim.openstreetmap.org/search?format=json&limit=1&q='+
     encodeURIComponent(address)
   );
+
   if(!r.ok) throw Error('Geocoding request failed');
+
   const j=await r.json();
+
   if(!j.length) throw Error('Address not found');
-  return {lat:Number(j[0].lat),lon:Number(j[0].lon)};
+
+  return {
+    lat:Number(j[0].lat),
+    lon:Number(j[0].lon)
+  };
 }
 
 async function uploadPhoto(file){
@@ -1088,28 +1102,43 @@ async function uploadPhoto(file){
     throw Error('Each photo must be 10 MB or smaller.');
   }
 
-  const ext=(file.name.split('.').pop() || 'jpg').replace(/[^a-zA-Z0-9]/g,'').toLowerCase() || 'jpg';
+  const ext=(file.name.split('.').pop() || 'jpg')
+    .replace(/[^a-zA-Z0-9]/g,'')
+    .toLowerCase() || 'jpg';
+
   const path=`${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
 
   const {error}=await db.storage
     .from('garage-sale-photos')
-    .upload(path,file,{cacheControl:'3600',upsert:false,contentType:file.type});
+    .upload(path,file,{
+      cacheControl:'3600',
+      upsert:false,
+      contentType:file.type
+    });
 
   if(error) throw error;
 
-  const {data}=db.storage.from('garage-sale-photos').getPublicUrl(path);
+  const {data}=db.storage
+    .from('garage-sale-photos')
+    .getPublicUrl(path);
+
   return data.publicUrl || '';
 }
 
 async function uploadPhotos(files,status){
   const list=Array.from(files||[]);
-  if(list.length>5) throw Error('Please choose no more than 5 photos.');
+
+  if(list.length>5){
+    throw Error('Please choose no more than 5 photos.');
+  }
 
   const urls=[];
+
   for(let i=0;i<list.length;i++){
     status.textContent=`Uploading photo ${i+1} of ${list.length}...`;
     urls.push(await uploadPhoto(list[i]));
   }
+
   return urls;
 }
 
@@ -1151,6 +1180,7 @@ async function addSale(e){
   button.disabled=true;
 
   let loc={lat:null,lon:null};
+
   try{
     loc=await geocode(address);
   }catch(err){
@@ -1158,6 +1188,7 @@ async function addSale(e){
   }
 
   let photoUrls=[];
+
   if(photoFiles.length){
     try{
       photoUrls=await uploadPhotos(photoFiles,status);
@@ -1174,6 +1205,7 @@ async function addSale(e){
 
   let editToken='';
   let editTokenHash='';
+
   try{
     editToken=randomToken();
     editTokenHash=await sha256Hex(editToken);
@@ -1226,13 +1258,18 @@ async function addSale(e){
 function hideSale(id){
   const sale=sales.find(s=>String(s.id)===String(id));
   const label=sale?.address ? `\n\n${sale.address}` : '';
-  const ok=confirm('Hide this garage sale from your list? This only hides it for you and does not remove it for anyone else.'+label);
+
+  const ok=confirm(
+    'Hide this garage sale from your list? This only hides it for you and does not remove it for anyone else.'+label
+  );
+
   if(!ok) return;
 
   if(!isHidden(id)){
     hiddenIds.push(String(id));
     saveHiddenIds();
   }
+
   render();
 }
 
@@ -1242,79 +1279,107 @@ function restoreHiddenSales(){
   render();
 }
 
-
 document.getElementById('form').addEventListener('submit',addSale);
 document.getElementById('search').addEventListener('input',render);
 document.getElementById('searchBtn').addEventListener('click',render);
+
 document.getElementById('search').addEventListener('keydown',e=>{
   if(e.key==='Enter'){
     e.preventDefault();
     render();
   }
 });
+
 document.getElementById('restoreHidden').addEventListener('click',restoreHiddenSales);
 document.getElementById('refreshBtn').addEventListener('click',()=>loadSales(true));
 document.getElementById('printListBtn').addEventListener('click',printMyList);
 document.getElementById('shareListBtn').addEventListener('click',shareMyList);
+
 document.getElementById('compactViewBtn').addEventListener('click',()=>{
   compactView=!compactView;
+
   const button=document.getElementById('compactViewBtn');
+
   button.classList.toggle('active',compactView);
   button.textContent=compactView?'Regular View':'Compact View';
+
   render();
 });
+
 document.getElementById('useLocationBtn').addEventListener('click',requestLocation);
 document.getElementById('distanceFilter').addEventListener('change',render);
 document.getElementById('sortChoice').addEventListener('change',render);
+
 document.getElementById('clearFiltersBtn').addEventListener('click',()=>{
   document.getElementById('search').value='';
+
   dateFilter='all';
   categoryFilter='all';
   openNowOnly=false;
   savedOnly=false;
   photosOnly=false;
   hideVisited=false;
+
   document.getElementById('distanceFilter').value='all';
   document.getElementById('sortChoice').value='newest';
+
   document.getElementById('openNowBtn').classList.remove('active');
   document.getElementById('savedOnlyBtn').classList.remove('active');
   document.getElementById('photosOnlyBtn').classList.remove('active');
   document.getElementById('hideVisitedBtn').classList.remove('active');
-  document.querySelectorAll('.filter-btn[data-filter]').forEach(b=>b.classList.toggle('active',b.dataset.filter==='all'));
-  document.querySelectorAll('.category-btn').forEach(b=>b.classList.toggle('active',b.dataset.category==='all'));
+
+  document.querySelectorAll('.filter-btn[data-filter]').forEach(b=>{
+    b.classList.toggle('active',b.dataset.filter==='all');
+  });
+
+  document.querySelectorAll('.category-btn').forEach(b=>{
+    b.classList.toggle('active',b.dataset.category==='all');
+  });
+
   render();
 });
+
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape') closePhoto();
+
   if(document.getElementById('photoModal').classList.contains('open')){
     if(e.key==='ArrowLeft') changePhoto(-1);
     if(e.key==='ArrowRight') changePhoto(1);
   }
 });
+
 document.getElementById('photosOnlyBtn').addEventListener('click',()=>{
   photosOnly=!photosOnly;
   document.getElementById('photosOnlyBtn').classList.toggle('active',photosOnly);
   render();
 });
+
 document.getElementById('openNowBtn').addEventListener('click',()=>{
   openNowOnly=!openNowOnly;
   document.getElementById('openNowBtn').classList.toggle('active',openNowOnly);
   render();
 });
+
 document.getElementById('savedOnlyBtn').addEventListener('click',()=>{
   savedOnly=!savedOnly;
   document.getElementById('savedOnlyBtn').classList.toggle('active',savedOnly);
   render();
 });
+
 document.getElementById('hideVisitedBtn').addEventListener('click',()=>{
   hideVisited=!hideVisited;
   document.getElementById('hideVisitedBtn').classList.toggle('active',hideVisited);
   render();
 });
+
 document.querySelectorAll('.filter-btn[data-filter]').forEach(button=>{
   button.addEventListener('click',()=>{
     dateFilter=button.dataset.filter||'all';
-    document.querySelectorAll('.filter-btn[data-filter]').forEach(b=>b.classList.toggle('active',b===button));
+
+    document.querySelectorAll('.filter-btn[data-filter]').forEach(b=>{
+      b.classList.toggle('active',b===button);
+    });
+
     render();
   });
 });
@@ -1322,7 +1387,11 @@ document.querySelectorAll('.filter-btn[data-filter]').forEach(button=>{
 document.querySelectorAll('.category-btn').forEach(button=>{
   button.addEventListener('click',()=>{
     categoryFilter=button.dataset.category||'all';
-    document.querySelectorAll('.category-btn').forEach(b=>b.classList.toggle('active',b===button));
+
+    document.querySelectorAll('.category-btn').forEach(b=>{
+      b.classList.toggle('active',b===button);
+    });
+
     render();
   });
 });
