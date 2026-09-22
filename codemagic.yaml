@@ -1,0 +1,310 @@
+workflows:
+  ios-workflow:
+    name: Garage Sale Finder iOS Build
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+
+    integrations:
+      app_store_connect: Codemagic
+
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.donaldreckman.garagesalefinder
+      node: latest
+      xcode: latest
+      cocoapods: default
+      vars:
+        BUNDLE_ID: "com.donaldreckman.garagesalefinder"
+
+    scripts:
+      - name: Install Capacitor
+        script: |
+          set -eu
+
+          if [ ! -f package.json ]; then
+            npm init -y
+          fi
+
+          npm install @capacitor/core@7 @capacitor/cli@7 @capacitor/ios@7
+
+      - name: Create Garage Sale Finder iOS project
+        script: |
+          set -eu
+
+          rm -rf ios www
+          mkdir -p www
+
+          cp index.html www/index.html
+
+          if [ -f garage_sale_map_pin_icon.png ]; then
+            cp garage_sale_map_pin_icon.png www/garage_sale_map_pin_icon.png
+          fi
+
+          if [ -f donco_logo_footer.png ]; then
+            cp donco_logo_footer.png www/donco_logo_footer.png
+          fi
+
+          cat > capacitor.config.json <<'EOF'
+          {
+            "appId": "com.donaldreckman.garagesalefinder",
+            "appName": "Garage Sale Finder",
+            "webDir": "www"
+          }
+          EOF
+
+          npx cap add ios
+          npx cap sync ios
+
+      - name: Add Garage Sale Finder app icons
+        script: |
+          set -eu
+
+          ICON="garage_sale_map_pin_icon.png"
+          APPICON="ios/App/App/Assets.xcassets/AppIcon.appiconset"
+
+          if [ ! -f "$ICON" ]; then
+            echo "Missing garage_sale_map_pin_icon.png"
+            exit 1
+          fi
+
+          rm -rf "$APPICON"
+          mkdir -p "$APPICON"
+
+          # Remove transparency from the App Store icon source.
+          sips -s format jpeg "$ICON" --out /tmp/garage-icon.jpg >/dev/null
+          sips -s format png /tmp/garage-icon.jpg --out /tmp/garage-icon.png >/dev/null
+
+          make_icon () {
+            SIZE="$1"
+            NAME="$2"
+            sips -z "$SIZE" "$SIZE" /tmp/garage-icon.png --out "$APPICON/$NAME" >/dev/null
+          }
+
+          make_icon 20 AppIcon-20.png
+          make_icon 29 AppIcon-29.png
+          make_icon 40 AppIcon-40.png
+          make_icon 58 AppIcon-58.png
+          make_icon 60 AppIcon-60.png
+          make_icon 76 AppIcon-76.png
+          make_icon 80 AppIcon-80.png
+          make_icon 87 AppIcon-87.png
+          make_icon 120 AppIcon-120.png
+          make_icon 152 AppIcon-152.png
+          make_icon 167 AppIcon-167.png
+          make_icon 180 AppIcon-180.png
+          make_icon 1024 AppIcon-1024.png
+
+          cat > "$APPICON/Contents.json" <<'EOF'
+          {
+            "images": [
+              {
+                "idiom": "iphone",
+                "size": "20x20",
+                "scale": "2x",
+                "filename": "AppIcon-40.png"
+              },
+              {
+                "idiom": "iphone",
+                "size": "20x20",
+                "scale": "3x",
+                "filename": "AppIcon-60.png"
+              },
+              {
+                "idiom": "iphone",
+                "size": "29x29",
+                "scale": "2x",
+                "filename": "AppIcon-58.png"
+              },
+              {
+                "idiom": "iphone",
+                "size": "29x29",
+                "scale": "3x",
+                "filename": "AppIcon-87.png"
+              },
+              {
+                "idiom": "iphone",
+                "size": "40x40",
+                "scale": "2x",
+                "filename": "AppIcon-80.png"
+              },
+              {
+                "idiom": "iphone",
+                "size": "40x40",
+                "scale": "3x",
+                "filename": "AppIcon-120.png"
+              },
+              {
+                "idiom": "iphone",
+                "size": "60x60",
+                "scale": "2x",
+                "filename": "AppIcon-120.png"
+              },
+              {
+                "idiom": "iphone",
+                "size": "60x60",
+                "scale": "3x",
+                "filename": "AppIcon-180.png"
+              },
+              {
+                "idiom": "ipad",
+                "size": "20x20",
+                "scale": "1x",
+                "filename": "AppIcon-20.png"
+              },
+              {
+                "idiom": "ipad",
+                "size": "20x20",
+                "scale": "2x",
+                "filename": "AppIcon-40.png"
+              },
+              {
+                "idiom": "ipad",
+                "size": "29x29",
+                "scale": "1x",
+                "filename": "AppIcon-29.png"
+              },
+              {
+                "idiom": "ipad",
+                "size": "29x29",
+                "scale": "2x",
+                "filename": "AppIcon-58.png"
+              },
+              {
+                "idiom": "ipad",
+                "size": "40x40",
+                "scale": "1x",
+                "filename": "AppIcon-40.png"
+              },
+              {
+                "idiom": "ipad",
+                "size": "40x40",
+                "scale": "2x",
+                "filename": "AppIcon-80.png"
+              },
+              {
+                "idiom": "ipad",
+                "size": "76x76",
+                "scale": "1x",
+                "filename": "AppIcon-76.png"
+              },
+              {
+                "idiom": "ipad",
+                "size": "76x76",
+                "scale": "2x",
+                "filename": "AppIcon-152.png"
+              },
+              {
+                "idiom": "ipad",
+                "size": "83.5x83.5",
+                "scale": "2x",
+                "filename": "AppIcon-167.png"
+              },
+              {
+                "idiom": "ios-marketing",
+                "size": "1024x1024",
+                "scale": "1x",
+                "filename": "AppIcon-1024.png"
+              }
+            ],
+            "info": {
+              "author": "xcode",
+              "version": 1
+            }
+          }
+          EOF
+
+      - name: Configure iPhone permissions and build number
+        script: |
+          set -eu
+
+          export GARAGE_BUILD_NUMBER="${PROJECT_BUILD_NUMBER:?Missing project build number}"
+
+          python3 <<'PY'
+          import os
+          import plistlib
+          from pathlib import Path
+
+          path = Path("ios/App/App/Info.plist")
+
+          with path.open("rb") as file:
+              plist = plistlib.load(file)
+
+          plist["CFBundleDisplayName"] = "Garage Sale Finder"
+          plist["CFBundleShortVersionString"] = "1.0"
+          plist["CFBundleVersion"] = os.environ["GARAGE_BUILD_NUMBER"]
+
+          plist["ITSAppUsesNonExemptEncryption"] = False
+
+          plist["NSLocationWhenInUseUsageDescription"] = (
+              "Garage Sale Finder uses your location to show nearby garage sales "
+              "and calculate distance."
+          )
+
+          plist["NSCameraUsageDescription"] = (
+              "Garage Sale Finder uses the camera when you choose to add a photo "
+              "to a garage sale listing."
+          )
+
+          plist["NSPhotoLibraryUsageDescription"] = (
+              "Garage Sale Finder lets you choose photos to add to a garage sale listing."
+          )
+
+          with path.open("wb") as file:
+              plistlib.dump(plist, file)
+
+          print("Configured Garage Sale Finder build", os.environ["GARAGE_BUILD_NUMBER"])
+          PY
+
+      - name: Apply Apple signing
+        script: |
+          set -eu
+          cd ios/App
+          xcode-project use-profiles
+
+      - name: Build signed iOS app
+        script: |
+          set -eu
+          cd ios/App
+          xcode-project build-ipa --workspace App.xcworkspace --scheme App
+
+      - name: Verify finished Garage Sale Finder app
+        script: |
+          set -eu
+
+          python3 <<'PY'
+          import glob
+          import plistlib
+          import zipfile
+
+          archives = glob.glob("ios/App/build/ios/ipa/*.ipa")
+          assert len(archives) == 1, "Expected one IPA file"
+
+          with zipfile.ZipFile(archives[0]) as archive:
+              names = archive.namelist()
+
+              info = next(
+                  name for name in names
+                  if name.startswith("Payload/")
+                  and name.count("/") == 2
+                  and name.endswith("/Info.plist")
+              )
+
+              metadata = plistlib.loads(archive.read(info))
+
+              assert metadata["CFBundleIdentifier"] == "com.donaldreckman.garagesalefinder"
+
+              print(
+                  "Garage Sale Finder IPA verified. Build:",
+                  metadata["CFBundleVersion"]
+              )
+          PY
+
+    artifacts:
+      - ios/App/build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
