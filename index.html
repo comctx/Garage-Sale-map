@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Garage Sale Finder</title>
 <link rel="icon" type="image/png" href="garage_sale_map_pin_icon.png">
 <link rel="apple-touch-icon" href="garage_sale_map_pin_icon.png">
@@ -28,6 +28,45 @@ button{border:0;border-radius:9px;padding:11px 14px;font-weight:700;cursor:point
 .muted{color:#64748b;font-size:14px}
 .error{color:#991b1b}.sale-photo{width:100%;height:150px;object-fit:cover;border-radius:10px;display:block;cursor:pointer}.sale-photo-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;max-width:620px;margin:8px 0 12px}.sale-photo-count{font-size:13px;color:#64748b;margin-top:5px}.open-now-btn.active{background:#16a34a;color:#fff}.badge-open{background:#dcfce7;color:#166534}.badge-my-sale{background:#dbeafe;color:#1d4ed8}.owner-btn{background:#dbeafe;color:#1d4ed8}.end-sale-btn{background:#fee2e2;color:#991b1b}.photo-nav{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.92);font-size:28px;padding:0;z-index:2}.photo-prev{left:8px}.photo-next{right:8px}.photo-counter{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);background:rgba(0,0,0,.65);color:#fff;padding:5px 9px;border-radius:999px;font-size:13px}.setup-note{margin:10px 0;padding:10px 12px;border-radius:9px;background:#eff6ff;color:#1e40af;font-size:14px}.results-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.result-count{font-weight:700;color:#475569}.badge-row{display:flex;gap:7px;flex-wrap:wrap;margin:4px 0 8px}.sale-badge{display:inline-block;padding:5px 8px;border-radius:999px;font-size:12px;font-weight:800}.badge-new{background:#dcfce7;color:#166534}.badge-ending{background:#fee2e2;color:#991b1b}.badge-visited{background:#e0e7ff;color:#3730a3}.sale.visited-sale{background:#f8fafc;border-color:#cbd5e1}.sale.visited-sale h3{text-decoration:line-through;text-decoration-thickness:1px}.visited-btn.active{background:#e0e7ff;color:#3730a3}.hide-visited-btn.active{background:#2563eb;color:#fff}.personal-note{margin:8px 0;padding:9px 11px;border-left:4px solid #d4af37;border-radius:7px;background:#fffbeb;color:#713f12}.note-btn.active{background:#fef3c7;color:#92400e}.refresh-status{align-self:center}.compact-btn.active{background:#2563eb;color:#fff}#list.compact-view .sale{padding:10px;margin-top:8px}#list.compact-view .sale h3{margin:2px 0 6px}#list.compact-view .sale p{margin:4px 0}#list.compact-view .sale-photo{height:100px}#list.compact-view .sale-photo-grid{grid-template-columns:repeat(auto-fit,minmax(95px,1fr));max-width:440px;margin:6px 0 8px}#list.compact-view .actions{gap:6px;margin-top:7px}#list.compact-view .actions button{padding:8px 10px;font-size:14px}.photo-modal{position:fixed;inset:0;background:rgba(0,0,0,.82);display:none;align-items:center;justify-content:center;padding:20px;z-index:9999}.photo-modal.open{display:flex}.photo-modal-inner{position:relative;max-width:min(900px,95vw);max-height:90vh}.photo-modal img{display:block;max-width:100%;max-height:85vh;border-radius:12px;background:#fff}.photo-modal-close{position:absolute;right:-10px;top:-12px;width:44px;height:44px;border-radius:50%;background:#fff;color:#111827;font-size:26px;line-height:1;padding:0;box-shadow:0 3px 12px rgba(0,0,0,.35)}.photo-section{margin-top:16px;padding:16px;border:2px solid #2563eb;border-radius:12px;background:#eff6ff}.photo-title{font-size:20px;font-weight:800;color:#1d4ed8;margin-bottom:6px;display:block}.photo-note{display:block;font-size:14px;color:#475569;margin:6px 0 0}.empty-state{padding:22px;border:2px solid #cbd5e1;border-radius:12px;background:#f8fafc;text-align:center;font-size:22px;font-weight:700;color:#334155;margin-top:12px}.empty-state small{display:block;font-size:14px;font-weight:400;color:#64748b;margin-top:6px}
 @media(max-width:700px){.grid{grid-template-columns:1fr}#map{height:340px}}
+
+/* iPhone layout fixes */
+html{scroll-padding-top:16px}
+body{min-height:100vh;min-height:100dvh}
+.search-row input{min-width:0}
+@media(max-width:700px){
+  header{
+    padding-top:calc(18px + env(safe-area-inset-top, 0px));
+    padding-right:14px;
+    padding-left:14px;
+  }
+  header h1{
+    font-size:clamp(28px,8vw,38px);
+    line-height:1.08;
+  }
+  .wrap{
+    padding-bottom:calc(18px + env(safe-area-inset-bottom, 0px));
+  }
+  .search-row{
+    display:grid;
+    grid-template-columns:minmax(0,1fr);
+    gap:10px;
+    align-items:stretch;
+  }
+  .search-row input{
+    display:block;
+    width:100%;
+    min-width:0;
+    padding:13px;
+    font-size:16px;
+  }
+  .search-row button{
+    display:block;
+    width:100%;
+    min-width:0;
+    min-height:48px;
+  }
+  #search{scroll-margin-top:calc(90px + env(safe-area-inset-top, 0px));}
+}
 </style>
 </head>
 <body>
@@ -36,7 +75,7 @@ button{border:0;border-radius:9px;padding:11px 14px;font-weight:700;cursor:point
 <div class="wrap">
   <section class="card">
     <div class="search-row">
-      <input id="search" placeholder="Search by address, item, or ZIP code...">
+      <input id="search" type="search" enterkeyhint="search" aria-label="Search by address, item, or ZIP code" placeholder="Search by address, item, or ZIP code...">
       <button id="searchBtn" class="primary" type="button">Search</button>
     </div>
     <div class="filter-row" aria-label="Date filters">
@@ -1269,8 +1308,13 @@ document.getElementById('searchBtn').addEventListener('click',render);
 document.getElementById('search').addEventListener('keydown',e=>{
   if(e.key==='Enter'){
     e.preventDefault();
+    e.currentTarget.blur();
     render();
   }
+});
+
+document.getElementById('search').addEventListener('focus',e=>{
+  setTimeout(()=>e.currentTarget.scrollIntoView({behavior:'smooth',block:'center'}),250);
 });
 document.getElementById('restoreHidden').addEventListener('click',restoreHiddenSales);
 document.getElementById('refreshBtn').addEventListener('click',()=>loadSales(true));
