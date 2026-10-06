@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="Garage Sale Finder">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
-body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f3f4f6;color:#1f2937}
+html,body{max-width:100%;overflow-x:hidden}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f3f4f6;color:#1f2937}
 header{background:#2563eb;color:#fff;padding:18px 20px}
 header h1{margin:0 0 4px}
 .wrap{width:min(1050px,calc(100% - 24px));margin:18px auto 40px;display:grid;gap:18px}
@@ -44,7 +44,14 @@ body{min-height:100vh;min-height:100dvh}
     line-height:1.08;
   }
   .wrap{
+    width:calc(100% - 20px);
+    margin:12px auto 28px;
+    gap:14px;
     padding-bottom:calc(18px + env(safe-area-inset-bottom, 0px));
+  }
+  .card{
+    padding:15px;
+    border-radius:12px;
   }
   .search-row{
     display:grid;
@@ -64,8 +71,22 @@ body{min-height:100vh;min-height:100dvh}
     width:100%;
     min-width:0;
     min-height:48px;
+    font-size:16px;
   }
-  #search{scroll-margin-top:calc(90px + env(safe-area-inset-top, 0px));}
+  .filter-row{
+    gap:7px;
+  }
+  .filter-row button{
+    min-height:42px;
+  }
+  .distance-select{
+    max-width:100%;
+  }
+  #search{scroll-margin-top:calc(110px + env(safe-area-inset-top, 0px));}
+  #map{height:320px;}
+  input,textarea,select{font-size:16px;}
+  .actions button{min-height:42px;}
+}
 }
 </style>
 </head>
