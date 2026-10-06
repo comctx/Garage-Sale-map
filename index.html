@@ -107,7 +107,25 @@ button{border:0;border-radius:9px;padding:11px 14px;font-weight:700;cursor:point
   color:#fff;
   border-color:#0f6c36;
   box-shadow:0 3px 9px rgba(15,108,54,.2);
-}.distance-select{min-height:41px;padding:9px 10px;border:1px solid #cbd5e1;border-radius:9px;background:white;color:#1f2937;font-weight:700}.favorite-btn.active{background:#fef3c7;color:#92400e}.distance-label{font-size:14px;font-weight:700;color:#475569}
+}
+.more-filters{
+  margin-top:12px;
+  border-top:1px solid #e7ebe6;
+  padding-top:10px;
+}
+.more-filters summary{
+  cursor:pointer;
+  font-weight:800;
+  color:#285c3b;
+  list-style:none;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:7px 2px;
+}
+.more-filters summary::-webkit-details-marker{display:none}
+.more-filters summary:after{content:"＋";font-size:20px;color:#9a7519}
+.more-filters[open] summary:after{content:"−"}.distance-select{min-height:41px;padding:9px 10px;border:1px solid #cbd5e1;border-radius:9px;background:white;color:#1f2937;font-weight:700}.favorite-btn.active{background:#fef3c7;color:#92400e}.distance-label{font-size:14px;font-weight:700;color:#475569}
 .sale{
   border:1px solid #e5e1d7;
   border-left:5px solid #d59b2d;
@@ -230,41 +248,45 @@ body{min-height:100vh;min-height:100dvh}
       <button id="savedOnlyBtn" class="filter-btn" type="button">★ Saved Sales</button>
       <button id="hideVisitedBtn" class="filter-btn hide-visited-btn" type="button">Hide Visited</button>
     </div>
-    <div class="filter-row" aria-label="Item category filters">
-      <span class="distance-label">Quick Items</span>
-      <button class="filter-btn category-btn active" type="button" data-category="all">All Items</button>
-      <button class="filter-btn category-btn" type="button" data-category="tools">Tools</button>
-      <button class="filter-btn category-btn" type="button" data-category="furniture">Furniture</button>
-      <button class="filter-btn category-btn" type="button" data-category="clothes">Clothes</button>
-      <button class="filter-btn category-btn" type="button" data-category="toys">Toys & Games</button>
-    </div>
-    <div class="filter-row" aria-label="Distance filter">
-      <button id="useLocationBtn" class="secondary" type="button">📍 Use My Location</button>
-      <span class="distance-label">Show within</span>
-      <select id="distanceFilter" class="distance-select" disabled>
-        <option value="all">Any Distance</option>
-        <option value="5">5 miles</option>
-        <option value="10">10 miles</option>
-        <option value="25">25 miles</option>
-        <option value="50">50 miles</option>
-      </select>
-      <span id="locationStatus" class="muted">Location not set.</span>
-      <button id="photosOnlyBtn" class="filter-btn" type="button">📷 Photos Only</button>
-      <span class="distance-label">Sort</span>
-      <select id="sortChoice" class="distance-select">
-        <option value="newest">Newest First</option>
-        <option value="nearest">Nearest First</option>
-        <option value="ending">Ending Soonest</option>
-      </select>
-      <button id="clearFiltersBtn" class="secondary" type="button">Clear Filters</button>
-    </div>
-    <div class="filter-row" aria-label="View mode">
-      <span class="distance-label">View</span>
-      <button class="filter-btn view-mode-btn active" type="button" data-view="both">Map + List</button>
-      <button class="filter-btn view-mode-btn" type="button" data-view="map">Map Only</button>
-      <button class="filter-btn view-mode-btn" type="button" data-view="list">List Only</button>
-    </div>
     <div id="map"></div>
+
+    <details class="more-filters">
+      <summary>More Filters</summary>
+      <div class="filter-row" aria-label="Item category filters">
+        <span class="distance-label">Quick Items</span>
+        <button class="filter-btn category-btn active" type="button" data-category="all">All Items</button>
+        <button class="filter-btn category-btn" type="button" data-category="tools">Tools</button>
+        <button class="filter-btn category-btn" type="button" data-category="furniture">Furniture</button>
+        <button class="filter-btn category-btn" type="button" data-category="clothes">Clothes</button>
+        <button class="filter-btn category-btn" type="button" data-category="toys">Toys & Games</button>
+      </div>
+      <div class="filter-row" aria-label="Distance filter">
+        <button id="useLocationBtn" class="secondary" type="button">📍 Use My Location</button>
+        <span class="distance-label">Show within</span>
+        <select id="distanceFilter" class="distance-select" disabled>
+          <option value="all">Any Distance</option>
+          <option value="5">5 miles</option>
+          <option value="10">10 miles</option>
+          <option value="25">25 miles</option>
+          <option value="50">50 miles</option>
+        </select>
+        <span id="locationStatus" class="muted">Location not set.</span>
+        <button id="photosOnlyBtn" class="filter-btn" type="button">📷 Photos Only</button>
+        <span class="distance-label">Sort</span>
+        <select id="sortChoice" class="distance-select">
+          <option value="newest">Newest First</option>
+          <option value="nearest">Nearest First</option>
+          <option value="ending">Ending Soonest</option>
+        </select>
+        <button id="clearFiltersBtn" class="secondary" type="button">Clear Filters</button>
+      </div>
+      <div class="filter-row" aria-label="View mode">
+        <span class="distance-label">View</span>
+        <button class="filter-btn view-mode-btn active" type="button" data-view="both">Map + List</button>
+        <button class="filter-btn view-mode-btn" type="button" data-view="map">Map Only</button>
+        <button class="filter-btn view-mode-btn" type="button" data-view="list">List Only</button>
+      </div>
+    </details>
   </section>
 
   <section id="resultsCard" class="card">
@@ -549,7 +571,7 @@ function restoreUiSettings(){
     hideVisited=saved.hideVisited===true;
     compactView=saved.compactView===true;
 
-    if(['both','map','list'].includes(saved.viewMode)) viewMode=saved.viewMode;
+    viewMode='both';
     if(['newest','nearest','ending'].includes(saved.sortChoice)){
       document.getElementById('sortChoice').value=saved.sortChoice;
     }
