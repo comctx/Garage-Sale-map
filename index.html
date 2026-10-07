@@ -399,7 +399,7 @@ const VISITED_KEY='garage_sale_visited_ids_v1';
 const NOTES_KEY='garage_sale_personal_notes_v1';
 const UI_SETTINGS_KEY='garage_sale_ui_settings_v1';
 const MY_SALES_KEY='garage_sale_my_sale_tokens_v1';
-const ANYSKU_EVENTS_URL='https://www.anysku.com/api/v1/events';
+const ANYSKU_EVENTS_URL='https://app-api.anysku.com/api/v1/events';
 let hiddenIds=[];
 let favoriteIds=[];
 let visitedIds=[];
@@ -851,13 +851,16 @@ async function loadPublishedSales(){
     url.searchParams.set('postalCode',zip);
     url.searchParams.set('radius','25');
     const response=await fetch(url.toString(),{method:'GET',headers:{'Accept':'application/json'}});
-    if(!response.ok) throw new Error('HTTP '+response.status);
+    if(!response.ok){
+      const detail=await response.text().catch(()=> '');
+      throw new Error('HTTP '+response.status+(detail?' — '+detail.slice(0,120):''));
+    }
     const payload=await response.json();
     const rows=Array.isArray(payload)?payload:(payload.events||payload.data||payload.results||payload.items||[]);
     renderPublishedSales(rows);
   }catch(err){
     console.error('Published sales lookup failed',err);
-    host.innerHTML='<div class="empty-state">Published Sales Temporarily Unavailable<small>The main Garage Sale Finder map and your own listings are still working normally.</small></div>';
+    host.innerHTML='<div class="empty-state">Published Sales Temporarily Unavailable<small>The outside listing service did not respond. The main Garage Sale Finder map and your own listings are still working normally.</small></div>';
   }finally{
     button.disabled=false;
   }
