@@ -144,7 +144,7 @@ button{border:0;border-radius:9px;padding:11px 14px;font-weight:700;cursor:point
   border:2px solid #d59b2d;
   border-radius:14px;
   background:#fff8e8;
-}.photo-title{font-size:20px;font-weight:800;color:#8a5b00;margin-bottom:6px;display:block}.photo-note{display:block;font-size:14px;color:#475569;margin:6px 0 0}.empty-state{padding:22px;border:2px solid #cbd5e1;border-radius:12px;background:#f8fafc;text-align:center;font-size:22px;font-weight:700;color:#334155;margin-top:12px}.empty-state small{display:block;font-size:14px;font-weight:400;color:#64748b;margin-top:6px}
+}.photo-title{font-size:20px;font-weight:800;color:#8a5b00;margin-bottom:6px;display:block}.photo-note{display:block;font-size:14px;color:#475569;margin:6px 0 0}.empty-state{padding:22px;border:2px solid #cbd5e1;border-radius:12px;background:#f8fafc;text-align:center;font-size:22px;font-weight:700;color:#334155;margin-top:12px}.empty-state small{display:block;font-size:14px;font-weight:400;color:#64748b;margin-top:6px}.published-card{border-top:4px solid #d59b2d}.published-card .search-row{margin-top:12px}.published-source{display:inline-block;padding:4px 8px;border-radius:999px;background:#fff3cd;color:#795700;border:1px solid #efd98b;font-size:12px;font-weight:800}.published-sale{border:1px solid #e5e1d7;border-left:5px solid #d59b2d;border-radius:14px;padding:14px;margin-top:12px;background:#fffdf8}.published-sale h3{margin:0 0 8px;color:#21483f}.published-sale p{margin:5px 0}.published-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 @media(max-width:700px){.grid{grid-template-columns:1fr}#map{height:340px}}
 
 /* iPhone layout fixes */
@@ -289,6 +289,19 @@ body{min-height:100vh;min-height:100dvh}
     </details>
   </section>
 
+  <section id="publishedCard" class="card published-card">
+    <div class="results-head">
+      <h2>Local Published Sales</h2>
+      <span class="published-source">via anySKU</span>
+    </div>
+    <p class="muted">Find publicly published garage-sale events near a ZIP code. This section is separate from the main map so outside listings cannot disable it.</p>
+    <div class="search-row">
+      <input id="publishedZip" type="text" inputmode="numeric" maxlength="5" placeholder="ZIP code, for example 64068" aria-label="ZIP code for published garage sales">
+      <button id="publishedLoadBtn" class="primary" type="button">Find Published Sales</button>
+    </div>
+    <div id="publishedList"><p class="muted">Enter a ZIP code to look for published local sales.</p></div>
+  </section>
+
   <section id="resultsCard" class="card">
     <div class="results-head">
       <h2>Garage Sales</h2>
@@ -386,6 +399,7 @@ const VISITED_KEY='garage_sale_visited_ids_v1';
 const NOTES_KEY='garage_sale_personal_notes_v1';
 const UI_SETTINGS_KEY='garage_sale_ui_settings_v1';
 const MY_SALES_KEY='garage_sale_my_sale_tokens_v1';
+const ANYSKU_EVENTS_URL='https://www.anysku.com/api/v1/events';
 let hiddenIds=[];
 let favoriteIds=[];
 let visitedIds=[];
@@ -763,6 +777,90 @@ function esc(s){
 
 function directions(a){
   return 'https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent(a);
+}
+function publishedText(){
+  for(let i=0;i<arguments.length;i++){
+    const v=arguments[i];
+    if(v!==undefined && v!==null && String(v).trim()!=='') return v;
+  }
+  return '';
+}
+
+function publishedAddress(event){
+  const loc=event.location||event.venue||{};
+  const raw=publishedText(event.address,loc.address,event.eventAddress);
+  if(typeof raw==='string' && raw.trim()) return raw.trim();
+  if(raw && typeof raw==='object'){
+    return [raw.line1||raw.street||raw.address1||raw.streetAddress,raw.city,raw.state||raw.region,raw.postalCode||raw.zip].filter(Boolean).join(', ');
+  }
+  return publishedText(loc.name,event.city,event.postalCode,'Published local sale');
+}
+
+function publishedDate(value){
+  if(!value) return '';
+  const d=new Date(value);
+  if(Number.isNaN(d.getTime())) return String(value);
+  return d.toLocaleString([],{weekday:'short',month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+}
+
+function renderPublishedSales(rows){
+  const host=document.getElementById('publishedList');
+  const list=Array.isArray(rows)?rows:[];
+  if(!list.length){
+    host.innerHTML='<div class="empty-state">No Published Sales Found<small>Try another nearby ZIP code or check again closer to the weekend.</small></div>';
+    return;
+  }
+  host.innerHTML=list.map(function(event){
+    const title=publishedText(event.title,event.name,event.eventName,'Garage Sale');
+    const address=publishedAddress(event);
+    const starts=publishedText(event.startsAt,event.start_at,event.startAt,event.start,event.startTime);
+    const ends=publishedText(event.endsAt,event.end_at,event.endAt,event.end,event.endTime);
+    const notes=publishedText(event.description,event.summary,event.notes,'');
+    const source=String(publishedText(event.url,event.eventUrl,event.publicUrl,event.webUrl,event.shareUrl,'https://www.anysku.com/'));
+    let html='<div class="published-sale"><h3>'+esc(title)+'</h3><span class="published-source">PUBLISHED · anySKU</span>';
+    if(address) html+='<p><b>Location:</b> '+esc(address)+'</p>';
+    if(starts) html+='<p><b>Starts:</b> '+esc(publishedDate(starts))+'</p>';
+    if(ends) html+='<p><b>Ends:</b> '+esc(publishedDate(ends))+'</p>';
+    if(notes) html+='<p>'+esc(notes)+'</p>';
+    html+='<div class="published-actions">';
+    if(address) html+='<button class="primary" type="button" data-published-directions="'+esc(address)+'">Get Directions</button>';
+    html+='<button class="secondary" type="button" data-published-source="'+esc(source)+'">View Source</button></div></div>';
+    return html;
+  }).join('');
+  host.querySelectorAll('[data-published-directions]').forEach(function(button){
+    button.addEventListener('click',function(){window.open(directions(button.dataset.publishedDirections),'_blank');});
+  });
+  host.querySelectorAll('[data-published-source]').forEach(function(button){
+    button.addEventListener('click',function(){window.open(button.dataset.publishedSource,'_blank','noopener');});
+  });
+}
+
+async function loadPublishedSales(){
+  const input=document.getElementById('publishedZip');
+  const button=document.getElementById('publishedLoadBtn');
+  const host=document.getElementById('publishedList');
+  const zip=String(input.value||'').trim();
+  if(zip.length!==5 || !/^\d+$/.test(zip)){
+    host.innerHTML='<p class="error">Please enter a 5-digit ZIP code.</p>';
+    return;
+  }
+  button.disabled=true;
+  host.innerHTML='<p class="muted">Looking for published garage sales near '+esc(zip)+'...</p>';
+  try{
+    const url=new URL(ANYSKU_EVENTS_URL);
+    url.searchParams.set('postalCode',zip);
+    url.searchParams.set('radius','25');
+    const response=await fetch(url.toString(),{method:'GET',headers:{'Accept':'application/json'}});
+    if(!response.ok) throw new Error('HTTP '+response.status);
+    const payload=await response.json();
+    const rows=Array.isArray(payload)?payload:(payload.events||payload.data||payload.results||payload.items||[]);
+    renderPublishedSales(rows);
+  }catch(err){
+    console.error('Published sales lookup failed',err);
+    host.innerHTML='<div class="empty-state">Published Sales Temporarily Unavailable<small>The main Garage Sale Finder map and your own listings are still working normally.</small></div>';
+  }finally{
+    button.disabled=false;
+  }
 }
 
 function milesBetween(lat1,lon1,lat2,lon2){
@@ -1468,6 +1566,8 @@ function restoreHiddenSales(){
 
 
 document.getElementById('form').addEventListener('submit',addSale);
+document.getElementById('publishedLoadBtn').addEventListener('click',loadPublishedSales);
+document.getElementById('publishedZip').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();loadPublishedSales();}});
 document.getElementById('search').addEventListener('input',render);
 document.getElementById('searchBtn').addEventListener('click',render);
 document.getElementById('search').addEventListener('keydown',e=>{
